@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>知微 ZhiWei · 数据驱动的选题命中系统</title>
+  <style>
+    :root {
+      --bg:#f5f7fb; --ink:#1f2937; --muted:#64748b; --faint:#94a3b8;
+      --brand:#1a3b8b; --brand2:#4a2f9e;
+      --card:#ffffff; --border:#e2e8f0; --line:#eef2f8;
+      --ok:#1f7a45; --warn:#b45309;
+      --hit:#dc2626; --hit2:#f97316;   /* 红=高（涨），符合国内语义 */
+      --cool:#3b82f6;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",Helvetica,Arial,sans-serif;
+      background:radial-gradient(1200px 620px at 82% -12%, #e8f0fb 0%, var(--bg) 55%);
+      color:var(--ink); min-height:100vh; padding:30px 20px 48px;
+    }
+    .wrap { width:100%; max-width:1080px; margin:0 auto; }
+
+    /* ---- Header ---- */
+    .badge { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--brand);
+      background:#e8f0fb; border:1px solid #c9d9f3; padding:5px 12px; border-radius:999px; }
+    .live { font-size:11px; color:var(--faint); border:1px solid var(--border); border-radius:999px; padding:4px 10px;
+      display:inline-flex; align-items:center; gap:6px; }
+    .dot { width:7px; height:7px; border-radius:50%; background:var(--faint); }
+    .dot.on { background:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,.15); }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    h1 { font-size:32px; line-height:1.15; color:var(--brand); letter-spacing:-.5px; margin-top:16px; }
+    h1 span { color:var(--brand2); }
+    .sub { margin-top:10px; font-size:14.5px; color:var(--muted); line-height:1.7; max-width:760px; }
+    .pills { margin-top:16px; display:flex; gap:8px; flex-wrap:wrap; }
+    .pill { font-size:12px; color:#475569; background:#eef2f8; border:1px solid #e2e8f0; padding:5px 11px; border-radius:8px; }
+
+    /* ---- KPI ---- */
+    .kpis { margin-top:24px; display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+    @media(min-width:720px){ .kpis { grid-template-columns:repeat(4,1fr); } }
+    .kpi { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px 18px;
+      box-shadow:0 6px 22px rgba(26,59,139,.05); position:relative; overflow:hidden; }
+    .kpi::after { content:""; position:absolute; right:-16px; top:-16px; width:60px; height:60px; border-radius:50%;
+      background:radial-gradient(circle,rgba(74,47,158,.08),transparent 70%); }
+    .kpi .k { font-size:12.5px; color:var(--muted); }
+    .kpi .v { font-size:28px; font-weight:800; color:var(--ink); margin-top:6px; letter-spacing:-.5px; }
+    .kpi .v small { font-size:14px; font-weight:600; color:var(--muted); }
+    .kpi .h { font-size:11.5px; color:var(--faint); margin-top:4px; }
+    .kpi.accent .v { color:var(--hit); }
+
+    /* ---- Layout ---- */
+    .grid { margin-top:16px; display:grid; grid-template-columns:1fr; gap:16px; }
+    @media(min-width:860px){ .grid.two { grid-template-columns:1.1fr .9fr; } }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px 22px;
+      box-shadow:0 8px 30px rgba(26,59,139,.06); }
+    .card h2 { font-size:15.5px; color:var(--ink); display:flex; align-items:center; gap:8px; }
+    .card .tip { font-size:12.5px; color:var(--muted); margin:6px 0 14px; line-height:1.6; }
+
+    textarea { width:100%; min-height:88px; border:1px solid var(--border); border-radius:10px; padding:12px;
+      font-size:14px; font-family:inherit; color:var(--ink); resize:vertical; line-height:1.6; }
+    textarea:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(26,59,139,.1); }
+    .btn { appearance:none; border:none; cursor:pointer; font-size:14.5px; font-weight:600; color:#fff;
+      background:linear-gradient(135deg,#1a3b8b,#4a2f9e); padding:11px 20px; border-radius:10px; margin-top:12px;
+      transition:transform .08s ease, box-shadow .2s ease; box-shadow:0 6px 18px rgba(74,47,158,.25); }
+    .btn:hover { transform:translateY(-1px); box-shadow:0 10px 24px rgba(74,47,158,.3); }
+    .btn:disabled { opacity:.6; cursor:progress; }
+    .status { margin-top:10px; font-size:12.5px; color:var(--muted); }
+    .status b { color:var(--ok); }
+
+    /* 评分结果 */
+    .score-item { border:1px solid var(--border); border-radius:12px; padding:13px 15px; margin-top:11px; }
+    .score-head { display:flex; align-items:center; gap:12px; }
+    .score-num { font-size:26px; font-weight:800; min-width:54px; text-align:center; border-radius:10px; padding:5px 6px; color:#fff; }
+    .lv-强推 { background:#dc2626; } .lv-可做 { background:#ea580c; }
+    .lv-谨慎 { background:#ca8a04; } .lv-不建议 { background:#64748b; }
+    .score-topic { font-size:14.5px; font-weight:600; }
+    .score-level { font-size:11.5px; color:var(--muted); }
+    .reasons { margin-top:9px; }
+    .reasons li { list-style:none; font-size:12.5px; color:#475569; line-height:1.65; padding-left:15px; position:relative; }
+    .reasons li::before { content:"▸"; position:absolute; left:0; color:var(--brand2); }
+
+    /* 通用条形 */
+    .row { display:flex; align-items:center; gap:10px; margin:9px 0; font-size:13px; }
+    .row .lab { width:64px; color:var(--muted); flex:none; }
+    .row .track { flex:1; height:16px; background:var(--line); border-radius:99px; overflow:hidden; position:relative; }
+    .row .track > i { display:block; height:100%; border-radius:99px;
+      background:linear-gradient(90deg,var(--hit),var(--hit2)); }
+    .row .track.cool > i { background:linear-gradient(90deg,#60a5fa,#3b82f6); }
+    .row .val { width:58px; text-align:right; font-weight:700; flex:none; }
+    .row .val.z { color:var(--faint); font-weight:600; }
+
+    /* 关键词 chips */
+    .kw { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+    .kw .c { font-size:12.5px; padding:6px 11px; border-radius:99px; border:1px solid var(--border); background:#fff;
+      display:flex; align-items:center; gap:6px; }
+    .kw .c b { color:var(--hit); }
+    .kw .c .n { color:var(--faint); font-size:11px; }
+    .stars { letter-spacing:-1px; }
+
+    /* 选题排名表 */
+    .tbl { width:100%; border-collapse:collapse; font-size:13px; margin-top:6px; }
+    .tbl th { text-align:left; font-size:11.5px; color:var(--faint); font-weight:600; padding:6px 4px; border-bottom:1px solid var(--border); }
+    .tbl td { padding:8px 4px; border-bottom:1px solid var(--line); }
+    .tbl td:last-child, .tbl th:last-child { text-align:right; }
+    .tbl .hr { font-weight:800; }
+    .hr.hi { color:var(--hit); } .hr.mid { color:var(--warn); } .hr.lo { color:var(--faint); }
+    .mini-bar { display:inline-block; width:46px; height:6px; background:var(--line); border-radius:99px; overflow:hidden; vertical-align:middle; margin-left:6px; }
+    .mini-bar > i { display:block; height:100%; background:linear-gradient(90deg,var(--hit),var(--hit2)); }
+
+    /* 闭环流程条 */
+    .flow { margin-top:16px; display:flex; align-items:stretch; gap:0; flex-wrap:wrap; }
+    .step { flex:1; min-width:140px; background:var(--card); border:1px solid var(--border); border-radius:12px;
+      padding:14px 15px; position:relative; box-shadow:0 4px 16px rgba(26,59,139,.04); }
+    .step .n { font-size:11px; color:#fff; background:var(--brand2); width:20px; height:20px; border-radius:50%;
+      display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
+    .step h3 { font-size:13.5px; margin-top:8px; color:var(--ink); }
+    .step p { font-size:11.5px; color:var(--muted); margin-top:4px; line-height:1.55; }
+    .step .tag { font-size:10.5px; color:var(--brand2); margin-top:7px; display:inline-block;
+      background:#f2effb; border:1px solid #e5ddf7; padding:2px 7px; border-radius:6px; }
+    .arrow { align-self:center; color:var(--faint); font-size:18px; padding:0 4px; }
+    @media(max-width:720px){ .arrow { display:none; } .step { min-width:100%; } }
+
+    .sec-title { margin-top:28px; font-size:13px; font-weight:700; color:var(--muted); letter-spacing:.3px;
+      display:flex; align-items:center; gap:8px; }
+    .sec-title::before { content:""; width:4px; height:14px; background:linear-gradient(var(--brand),var(--brand2)); border-radius:2px; }
+
+    .foot { margin-top:30px; font-size:11.5px; color:var(--faint); text-align:center; line-height:1.9; }
+    a { color:var(--brand2); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="badge">🧭 AI 黑客松 · 方向 B · 基于 WorkBuddy + EdgeOne Makers</span>
+      <span class="live"><span class="dot" id="liveDot"></span><span id="liveText">数据源自检中…</span></span>
+    </div>
+
+    <h1>知微 <span>ZhiWei</span></h1>
+    <p class="sub">
+      别人的 AI 工具帮你「把内容写出来」，知微帮你「决定<b>写什么</b>最值得写」——
+      用你自己的历史发布数据为每个候选选题打「命中分」，一稿自动适配多平台，发布数据回流让系统越用越准。
+      <b>不是 AI 拍脑袋，是你的数据在说话。</b>
+    </p>
+    <div class="pills">
+      <span class="pill">🧭 选题评分官 Expert</span>
+      <span class="pill">📡 选题雷达 Skill</span>
+      <span class="pill">✍️ 多平台改写 Skill</span>
+      <span class="pill">📈 命中率复盘 Skill</span>
+      <span class="pill">⏰ 定时闭环 Automation</span>
+    </div>
+
+    <!-- KPI 条 -->
+    <div class="kpis" id="kpis"></div>
+
+    <!-- 主区：评分 + 时段热力 -->
+    <div class="grid two">
+      <div class="card">
+        <h2>🎯 选题命中分 · 现场评分</h2>
+        <p class="tip">输入你在犹豫的候选选题（每行一个），系统基于历史发布数据实时打分并给出<b>可解释</b>的理由。这就是「数据驱动选题」的核心。</p>
+        <textarea id="cands">AI工具实操：5个提示词技巧
+深夜随笔：聊聊最近的心情
+爆款标题的6个套路拆解</textarea>
+        <button class="btn" id="scoreBtn">给这些选题打分 →</button>
+        <div class="status" id="scoreStatus">状态：待评分</div>
+        <div id="scoreOut"></div>
+      </div>
+
+      <div class="card">
+        <h2>🕐 发布时段命中热力</h2>
+        <p class="tip">相同的选题，什么时段发更容易爆？这是系统从历史数据里学出的时段规律。</p>
+        <div id="timeOut"><div class="status">加载中…</div></div>
+        <h2 style="margin-top:18px;">🏷️ 高命中关键词（按置信度）</h2>
+        <p class="tip">命中率 × 样本量加权，避免「只爆过一次」的偶然词误导选题。</p>
+        <div id="kwOut" class="kw"><div class="status">加载中…</div></div>
+      </div>
+    </div>
+
+    <!-- 选题排名 -->
+    <div class="grid">
+      <div class="card">
+        <h2>📊 历史选题命中率排名</h2>
+        <p class="tip">哪些选题方向值得持续投入、哪些该做减法，一目了然。</p>
+        <div id="topicOut"><div class="status">加载中…</div></div>
+      </div>
+    </div>
+
+    <!-- 闭环流程 -->
+    <div class="sec-title">数据驱动闭环 · WorkBuddy 可复用资产贯穿始终</div>
+    <div class="flow" id="flow"></div>
+
+    <p class="foot">
+      部署于 EdgeOne Makers · 全球边缘 · Serverless Functions + Edge KV · 内置模型 50 万 token/月<br/>
+      © 知微 ZhiWei　|　<span id="apiEnv">环境自检中…</span>
+    </p>
+  </div>
+
+  <script>
+  const $ = (id) => document.getElementById(id);
+  const pct = (x) => Math.round(x*100) + '%';
+  const esc = (s) => String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const timeZh = { dawn:'凌晨', morning:'上午', noon:'午间', afternoon:'下午', evening:'晚间', night:'深夜', unknown:'未知' };
+
+  /* ================= 本地真实数据快照（本地 dev 已验证，31 篇种子数据）=================
+     用途：EdgeOne 证书未就绪 / KV 未绑定 / 纯静态预览时，页面依然完整、真实、可演示。
+     API 就绪后会用实时数据自动覆盖。 */
+  const SNAPSHOT = {"total":31,"hits":10,"hitRate":0.323,"hitThreshold":4490,"avgScore":2801,
+    "topKeywords":[{"key":"AI工具","count":10,"hit":7,"hitRate":0.7,"avgScore":4927},{"key":"避坑","count":3,"hit":3,"hitRate":1,"avgScore":5903},{"key":"提示词","count":2,"hit":2,"hitRate":1,"avgScore":4862},{"key":"工作流","count":2,"hit":1,"hitRate":0.5,"avgScore":4427},{"key":"副业","count":1,"hit":1,"hitRate":1,"avgScore":6729},{"key":"自媒体","count":1,"hit":1,"hitRate":1,"avgScore":6077},{"key":"复盘","count":1,"hit":1,"hitRate":1,"avgScore":6077},{"key":"爆款","count":1,"hit":1,"hitRate":1,"avgScore":5835}],
+    "byTime":[{"key":"evening","count":16,"hit":10,"hitRate":0.625,"avgScore":4718},{"key":"afternoon","count":2,"hit":0,"hitRate":0,"avgScore":1502},{"key":"noon","count":5,"hit":0,"hitRate":0,"avgScore":1278},{"key":"night","count":7,"hit":0,"hitRate":0,"avgScore":247},{"key":"morning","count":1,"hit":0,"hitRate":0,"avgScore":235}],
+    "byTitle":{"hasNumber":{"count":14,"hit":8,"hitRate":0.571},"hasQuestion":{"count":2,"hit":1,"hitRate":0.5},"hasColon":{"count":2,"hit":1,"hitRate":0.5},"hasPain":{"count":5,"hit":4,"hitRate":0.8}},
+    "byTopic":[{"topic":"避坑复盘","count":2,"hit":2,"hitRate":1,"avgScore":6237},{"topic":"AI工具实操","count":8,"hit":6,"hitRate":0.75,"avgScore":4919},{"topic":"内容创作","count":3,"hit":1,"hitRate":0.333,"avgScore":2658},{"topic":"效率方法","count":5,"hit":1,"hitRate":0.2,"avgScore":3027},{"topic":"职场成长","count":2,"hit":0,"hitRate":0,"avgScore":2597},{"topic":"AI行业观察","count":3,"hit":0,"hitRate":0,"avgScore":1582},{"topic":"蹭热点","count":2,"hit":0,"hitRate":0,"avgScore":302},{"topic":"公告通知","count":1,"hit":0,"hitRate":0,"avgScore":235},{"topic":"随笔感悟","count":5,"hit":0,"hitRate":0,"avgScore":226}]};
+
+  /* 置信度排序：命中率 × log(1+样本量)，避免 n=1 的偶然 100% 排前 */
+  function rankByConfidence(arr){
+    return arr.slice().map(k=>({...k, _conf:k.hitRate * Math.log(1+k.count)}))
+      .sort((a,b)=> b._conf - a._conf || b.count - a.count);
+  }
+  function confStars(count){ return count>=5?'★★★':count>=3?'★★☆':count>=2?'★☆☆':'☆☆☆'; }
+
+  /* ---------------- 渲染各区块（数据来自 API 或 SNAPSHOT） ---------------- */
+  function render(data){
+    // KPI
+    const bestTime = data.byTime.slice().sort((a,b)=>b.hitRate-a.hitRate)[0];
+    const kpi = [
+      { k:'历史样本', v:data.total, s:'篇', h:'纳入规律学习' },
+      { k:'整体命中率', v:pct(data.hitRate), h:'爆款 '+data.hits+' 篇 · 阈值 P70', accent:true },
+      { k:'最佳发布时段', v: bestTime?timeZh[bestTime.key]:'—', s: bestTime?('  '+pct(bestTime.hitRate)):'', h:'时段规律差异显著' },
+      { k:'已建规律维度', v:'3', s:'类', h:'关键词 / 时段 / 标题' },
+    ];
+    $('kpis').innerHTML = kpi.map(x =>
+      '<div class="kpi'+(x.accent?' accent':'')+'"><div class="k">'+x.k+'</div>'
+      +'<div class="v">'+x.v+(x.s?'<small>'+x.s+'</small>':'')+'</div>'
+      +'<div class="h">'+x.h+'</div></div>').join('');
+
+    // 时段热力
+    const tmax = Math.max(...data.byTime.map(t=>t.hitRate), 0.01);
+    const order = ['morning','noon','afternoon','evening','night','dawn'];
+    const tsorted = data.byTime.slice().sort((a,b)=>order.indexOf(a.key)-order.indexOf(b.key));
+    $('timeOut').innerHTML = tsorted.map(t=>{
+      const w = Math.round(t.hitRate/tmax*100);
+      const z = t.hitRate===0;
+      return '<div class="row"><span class="lab">'+timeZh[t.key]+'</span>'
+        +'<span class="track'+(z?' cool':'')+'"><i style="width:'+(z?3:w)+'%"></i></span>'
+        +'<span class="val'+(z?' z':'')+'">'+pct(t.hitRate)+'<span class="n" style="color:var(--faint);font-weight:600;font-size:11px;"> n='+t.count+'</span></span></div>';
+    }).join('');
+
+    // 高命中关键词（置信排序）
+    const kws = rankByConfidence(data.topKeywords).slice(0,8);
+    $('kwOut').innerHTML = kws.map(k=>
+      '<span class="c"><b>'+esc(k.key)+'</b> '+pct(k.hitRate)
+      +' <span class="stars" style="color:'+(k.count>=3?'#dc2626':k.count>=2?'#ea580c':'#cbd5e1')+'">'+confStars(k.count)+'</span>'
+      +' <span class="n">n='+k.count+'</span></span>').join('');
+
+    // 选题排名表
+    const rows = data.byTopic.slice(0,8).map(t=>{
+      const cls = t.hitRate>=0.5?'hi':t.hitRate>=0.25?'mid':'lo';
+      return '<tr><td>'+esc(t.topic)+'</td><td>'+t.count+' 篇</td>'
+        +'<td class="hr '+cls+'">'+pct(t.hitRate)
+        +'<span class="mini-bar"><i style="width:'+Math.round(t.hitRate*100)+'%"></i></span></td></tr>';
+    }).join('');
+    $('topicOut').innerHTML = '<table class="tbl"><thead><tr><th>选题方向</th><th>样本</th><th>命中率</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+
+  /* ---------------- 闭环流程条 ---------------- */
+  const STEPS = [
+    { n:1, t:'选题雷达', d:'抓热点 + 领域关键词，产候选选题清单', tag:'Skill' },
+    { n:2, t:'选题评分官', d:'基于历史规律为候选打命中分 + 可解释理由', tag:'Expert' },
+    { n:3, t:'多平台改写', d:'一稿适配公众号 / 视频号 / 小红书 / 知乎', tag:'Skill' },
+    { n:4, t:'数据回流', d:'发布后互动数据写入 Edge KV', tag:'Functions' },
+    { n:5, t:'命中率复盘', d:'提炼有效模式，反哺下一轮选题', tag:'Automation' },
+  ];
+  $('flow').innerHTML = STEPS.map((s,i)=>
+    '<div class="step"><span class="n">'+s.n+'</span><h3>'+s.t+'</h3><p>'+s.d+'</p><span class="tag">'+s.tag+'</span></div>'
+    + (i<STEPS.length-1?'<div class="arrow">→</div>':'')
+  ).join('');
+
+  /* ---------------- 数据源：优先实时 API，失败回退快照 ---------------- */
+  (async () => {
+    try {
+      const res = await fetch('/api/stats', { cache:'no-store' });
+      if (!res.ok) throw 0;
+      const j = await res.json();
+      const d = { ...j.summary, byTopic: j.byTopic };
+      render(d);
+      setLive(true, '实时数据 · EdgeOne KV');
+    } catch {
+      render(SNAPSHOT);
+      setLive(false, '演示快照 · 本地已验证 31 篇');
+    }
+  })();
+
+  function setLive(on, text){
+    $('liveDot').className = 'dot' + (on?' on':'');
+    $('liveText').textContent = text;
+  }
+
+  /* ---------------- 环境自检 ---------------- */
+  (async () => {
+    try {
+      const res = await fetch('/api/hello?name='+encodeURIComponent('黑客松评审'), { cache:'no-store' });
+      const ct = res.headers.get('content-type')||'';
+      if (res.ok && ct.includes('application/json')) { $('apiEnv').textContent = 'Serverless 环境正常 · /api/hello 已响应'; return; }
+      throw 0;
+    } catch { $('apiEnv').textContent = '静态预览环境（部署到 EdgeOne 并绑定 KV 后 API 实时生效）'; }
+  })();
+
+  /* ================= 现场评分：API 优先，失败用内嵌引擎兜底 ================= */
+  $('scoreBtn').addEventListener('click', async () => {
+    const lines = $('cands').value.split('\n').map(x=>x.trim()).filter(Boolean);
+    if (!lines.length) { $('scoreStatus').textContent = '状态：请至少输入一个选题'; return; }
+    const candidates = lines.map(topic => ({ topic, plannedTime: defaultEveningToday(), plannedTitle: topic }));
+    $('scoreBtn').disabled = true; $('scoreStatus').textContent = '状态：评分中…'; $('scoreOut').innerHTML = '';
+    try {
+      const res = await fetch('/api/score', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ candidates }) });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      const j = await res.json();
+      $('scoreStatus').innerHTML = '状态：<b>完成</b> · 实时接口 · 基于 '+j.basedOn.posts+' 篇历史（命中率 '+pct(j.basedOn.hitRate)+'）';
+      $('scoreOut').innerHTML = j.scores.map(renderScore).join('');
+    } catch {
+      // 内嵌评分引擎（与后端 analytics.js 同逻辑的浏览器版），保证任何环境都能演示
+      const scores = localScore(candidates, SNAPSHOT);
+      $('scoreStatus').innerHTML = '状态：<b>完成</b>（演示引擎）· 基于 '+SNAPSHOT.total+' 篇历史（命中率 '+pct(SNAPSHOT.hitRate)+'）';
+      $('scoreOut').innerHTML = scores.map(renderScore).join('');
+    } finally { $('scoreBtn').disabled = false; }
+  });
+
+  function renderScore(s){
+    const reasons = (s.reasons||[]).map(r=>'<li>'+esc(r)+'</li>').join('');
+    return '<div class="score-item"><div class="score-head">'
+      +'<div class="score-num lv-'+s.level+'">'+s.score+'</div>'
+      +'<div><div class="score-topic">'+esc(s.topic)+'</div><div class="score-level">判定：'+s.level+'</div></div></div>'
+      +'<ul class="reasons">'+reasons+'</ul></div>';
+  }
+  function defaultEveningToday(){ const d=new Date(); d.setHours(20,30,0,0); return d.toISOString(); }
+
+  /* 浏览器版评分引擎：与 functions/_lib/analytics.js scoreCandidates 逻辑一致（简化） */
+  function localScore(cands, model){
+    const kwMap = new Map(model.topKeywords.map(k=>[k.key,k]));
+    const timeMap = new Map(model.byTime.map(t=>[t.key,t]));
+    const baseline = model.hitRate||0.3;
+    const titleFeat = (t='')=>({ hasNumber:/\d/.test(t), hasPain:/(踩坑|避坑|误区|别再|终于|居然|竟然|真相|复盘|血泪|后悔|必看|干货|保姆|手把手|一文|指南)/.test(t), len:t.length });
+    const tb = (iso)=>{ const d=new Date(iso); if(isNaN(d))return null; const h=d.getHours(); return h<6?'dawn':h<11?'morning':h<14?'noon':h<18?'afternoon':h<22?'evening':'night'; };
+    const autoKw = (topic='')=>{ const parts=String(topic).split(/[\s,，、。:：/|]+/).filter(Boolean); const zh=(String(topic).match(/[\u4e00-\u9fa5]{2,4}/g)||[]); return [...new Set([...parts,...zh])].slice(0,6); };
+    return cands.map(c=>{
+      const reasons=[]; let score=40;
+      const kws = (c.keywords&&c.keywords.length)?c.keywords:autoKw(c.topic);
+      let boost=0, matched=[];
+      for(const kw of kws){ const st=kwMap.get(kw); if(st&&st.hitRate>baseline){ boost+=Math.round((st.hitRate-baseline)*60); matched.push(kw+'(命中率'+pct(st.hitRate)+')'); } }
+      if(boost){ score+=Math.min(30,boost); reasons.push('选题关键词踩中历史高命中主题：'+matched.join('、')); }
+      else reasons.push('选题关键词与历史高命中主题重合度低，命中不确定性较高');
+      const b = c.plannedTime?tb(c.plannedTime):null;
+      if(b){ const st=timeMap.get(b); if(st&&st.hitRate>baseline){ score+=10; reasons.push('计划发布时段「'+timeZh[b]+'」历史命中率 '+pct(st.hitRate)+'，优于平均'); } else if(st){ score-=5; reasons.push('计划发布时段「'+timeZh[b]+'」历史表现偏弱，建议换时段'); } }
+      if(c.plannedTitle){ const f=titleFeat(c.plannedTitle); const tf=model.byTitle||{};
+        if(f.hasPain&&tf.hasPain&&tf.hasPain.hitRate>baseline){ score+=8; reasons.push('标题含痛点/情绪词，历史此类标题命中率更高'); }
+        if(f.hasNumber&&tf.hasNumber&&tf.hasNumber.hitRate>baseline){ score+=5; reasons.push('标题含数字，历史此类标题更易命中'); }
+        if(f.len>30){ score-=4; reasons.push('标题偏长（>30 字），建议精简'); }
+      }
+      score=Math.max(0,Math.min(100,Math.round(score)));
+      return { topic:c.topic, score, level: score>=75?'强推':score>=60?'可做':score>=45?'谨慎':'不建议', reasons };
+    }).sort((a,b)=>b.score-a.score);
+  }
+  </script>
+</body>
+</html>

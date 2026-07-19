@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# EdgeOne
+.env
+app/.edgeone/
+app/.tef_dist/
+**/.edgeone/*
+**/.tef_dist/*
+
+# Local KV / dev data (runtime, not source)
+app/data/kv.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Secrets — never commit
+*secret*
+*token*.env
