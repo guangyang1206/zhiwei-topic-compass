@@ -11,6 +11,9 @@ app/.tef_dist/
 # Local KV / dev data (runtime, not source)
 app/data/kv.json
 
+# WorkBuddy private working logs (keep local, never publish)
+.workbuddy/memory/
+
 # OS
 .DS_Store
 Thumbs.db
