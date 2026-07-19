@@ -1,6 +1,6 @@
 <div align="center">
 
-# 选题罗盘 · TopicCompass
+# 知微 · ZhiWei
 
 **数据驱动的选题命中与多平台发布分析 SaaS**
 *Data-driven topic hit-rate & multi-platform publishing analytics*
@@ -18,11 +18,11 @@
 
 ## 这是什么 / What is it
 
-选题罗盘（TopicCompass）帮助内容创作者和品牌市场团队回答一个核心问题：**下一篇内容，写什么、什么时候发、发到哪个平台，命中率最高？**
+知微（ZhiWei）帮助内容创作者和品牌市场团队回答一个核心问题：**下一篇内容，写什么、什么时候发、发到哪个平台，命中率最高？**
 
 它不靠"感觉"，而是把历史内容的真实表现（阅读、互动、命中与否）沉淀成数据，用一个可解释的评分引擎，为每个候选选题给出**命中概率评分 + 最佳发布时段 + 关键词置信度 + 多平台改写建议**。
 
-TopicCompass answers one question for creators and brand teams: **what to write next, when to publish, and on which platform — for the highest hit-rate.** It turns your historical content performance into an explainable scoring engine, no guesswork.
+ZhiWei answers one question for creators and brand teams: **what to write next, when to publish, and on which platform — for the highest hit-rate.** It turns your historical content performance into an explainable scoring engine, no guesswork.
 
 ## 四层架构 / Four-layer architecture
 
