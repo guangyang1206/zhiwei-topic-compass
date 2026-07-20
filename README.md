@@ -45,10 +45,12 @@ ZhiWei answers one question for creators and brand teams: **what to write next, 
 
 ```bash
 cd app
-npm install          # 安装 EdgeOne CLI 等依赖
+npm install          # 安装依赖
 npm run dev          # 本地开发（含目录路由 + 本地 KV 降级）
-npm run deploy       # 部署到 EdgeOne Makers
 ```
+
+部署：本仓库已关联 GitHub，`git push` 到 `main` 即由 **EdgeOne Pages 自动构建部署**（项目根目录 = `app`）。
+> 集成过程中踩过的坑与修复见 [EdgeOne 部署排障复盘](./docs/工程/EdgeOne部署排障复盘.md)。
 
 ## 目录结构 / Structure
 
@@ -66,6 +68,7 @@ app/                 EdgeOne Makers 部署根
 ├─ functions/        EdgeOne 边缘函数（API）
 └─ data/             种子数据
 docs/                方案书、架构图等交付物
+└─ 工程/             工程文档（部署排障复盘等）
 ```
 
 ## 技术栈 / Tech stack
