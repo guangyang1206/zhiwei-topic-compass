@@ -1,6 +1,11 @@
 # Dependencies
 node_modules/
 
+# Build output (Vite / SaaS 前端构建产物，非源码)
+app/dist/
+app/web/dist/
+**/.vite/
+
 # EdgeOne
 .env
 app/.edgeone/

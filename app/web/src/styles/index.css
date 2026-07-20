@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   知微 ZhiWei · 设计 token（迁移自 assets/design.css）
+   Linear 极简骨架 + Supabase 数据绿。亮色优先，可切暗色。
+   ============================================================ */
+:root {
+  --accent: #1D9E75;
+  --accent-hover: #17b981;
+  --accent-weak: #E1F5EE;
+  --accent-ink: #0F6E56;
+  --violet: #5e6ad2;
+
+  --ink: #16181d;
+  --ink-muted: #4b5058;
+  --ink-subtle: #6b7280;
+  --ink-tertiary: #9aa1ab;
+
+  --canvas: #ffffff;
+  --surface-1: #f8f9fb;
+  --surface-2: #f2f4f7;
+  --surface-3: #eceef2;
+  --hairline: #e5e8ec;
+  --hairline-strong: #d3d7dd;
+
+  --danger: #E24B4A;
+
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px;
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --shadow-sm: 0 1px 2px rgba(16,24,40,.04);
+  --shadow-md: 0 4px 16px rgba(16,24,40,.06);
+}
+
+:root[data-theme="dark"] {
+  --accent: #2ecc9b;
+  --accent-hover: #45e0b0;
+  --accent-weak: #10241d;
+  --accent-ink: #6fe3c0;
+  --violet: #828fff;
+
+  --ink: #f2f4f7;
+  --ink-muted: #b7bdc7;
+  --ink-subtle: #8a8f98;
+  --ink-tertiary: #62666d;
+
+  --canvas: #0b0d10;
+  --surface-1: #14171b;
+  --surface-2: #181c21;
+  --surface-3: #1f242a;
+  --hairline: #23272e;
+  --hairline-strong: #333944;
+
+  --danger: #F09595;
+
+  --shadow-sm: none;
+  --shadow-md: 0 8px 30px rgba(0,0,0,.4);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--canvas);
+  color: var(--ink);
+  transition: background .2s ease, color .2s ease;
+}
+
+/* 中文数字/代码用等宽 */
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* 命中率语义色：中国股市语义无关，这里高命中=绿（数据健康/成长） */
+.hit-strong { color: var(--accent); }
+.hit-weak { color: var(--ink-subtle); }
+
+/* 滚动条（暗色下更协调） */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }

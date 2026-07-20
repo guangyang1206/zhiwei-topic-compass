@@ -223,3 +223,25 @@ function pct(x) { return Math.round(x * 100) + '%'; }
 function zhTime(b) {
   return ({ dawn: '凌晨', morning: '上午', noon: '午间', afternoon: '下午', evening: '晚间', night: '深夜', unknown: '未知' })[b] || b;
 }
+
+/**
+ * 按选题聚合命中率（Dashboard 排名表用）。
+ * 输入 analyze()._posts（已带 _hit / _score）。
+ */
+export function aggregateByTopic(posts) {
+  const map = new Map();
+  for (const p of posts) {
+    const e = map.get(p.topic) || { topic: p.topic, count: 0, hit: 0, scoreSum: 0 };
+    e.count++; if (p._hit) e.hit++; e.scoreSum += (p._score || 0);
+    map.set(p.topic, e);
+  }
+  return [...map.values()]
+    .map(e => ({
+      topic: e.topic,
+      count: e.count,
+      hit: e.hit,
+      hitRate: +(e.hit / e.count).toFixed(3),
+      avgScore: Math.round(e.scoreSum / e.count),
+    }))
+    .sort((a, b) => b.hitRate - a.hitRate || b.avgScore - a.avgScore);
+}
