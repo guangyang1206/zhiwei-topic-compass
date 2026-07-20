@@ -11,16 +11,21 @@ export async function onRequest({ request, env }) {
   if (!backend) return fail('KV 未绑定：请在 EdgeOne 项目「数据存储」绑定命名空间，变量名 TOPIC_KV', 503);
   const store = createStore(backend);
 
-  const posts = await store.listJSON(K.postPrefix);
-  const model = analyze(posts);
+  try {
+    const posts = await store.listJSON(K.postPrefix);
+    const model = analyze(posts);
 
-  // 精简掉内部 _posts，只返回展示需要的
-  const { _posts, ...summary } = model;
+    // 精简掉内部 _posts，只返回展示需要的
+    const { _posts, ...summary } = model;
 
-  // 额外：按选题聚合排名（Dashboard 表格用）
-  const byTopic = aggregateByTopic(_posts);
+    // 额外：按选题聚合排名（Dashboard 表格用）
+    const byTopic = aggregateByTopic(_posts);
 
-  return ok({ summary, byTopic });
+    return ok({ summary, byTopic });
+  } catch (e) {
+    // 临时：把真实错误暴露出来定位 545
+    return fail('stats 运行时错误: ' + (e && e.message ? e.message : String(e)) + ' | stack: ' + (e && e.stack ? String(e.stack).slice(0, 300) : 'n/a'), 500);
+  }
 }
 
 function aggregateByTopic(posts) {
