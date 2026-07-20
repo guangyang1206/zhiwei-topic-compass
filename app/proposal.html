@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目方案书 · 知微 ZhiWei</title>
+<meta name="description" content="数据驱动的选题命中系统 —— 面向个人创作者的选题命中与多平台发布分析。别人的工具帮你把内容写出来，知微帮你决定写什么最值得写。">
+<link rel="stylesheet" href="assets/design.css">
+</head>
+<body>
+<header id="nav"></header>
+
+<section class="doc-hero">
+  <div class="container">
+    <div class="doc-kicker">Project Proposal</div>
+    <h1>项目方案书</h1>
+    <p class="doc-sub">数据驱动的选题命中系统 —— 面向个人创作者的选题命中与多平台发布分析。别人的工具帮你把内容写出来，知微帮你决定写什么最值得写。</p>
+    <div class="doc-meta"><span class="chip">AI 黑客松 · 方向 B</span><span class="chip">基于 WorkBuddy + EdgeOne Makers</span><span class="chip">个人参赛</span></div>
+  </div>
+</section>
+
+<div class="container doc-layout">
+  <aside class="doc-toc">
+    <div class="toc-title">目录 · Contents</div>
+    <nav>
+      <a class="lvl-2" href="#sec-1">0. 一句话定位</a>
+      <a class="lvl-2" href="#sec-2">1. 我们要解决的真实痛点</a>
+      <a class="lvl-2" href="#sec-3">2. 命题契合度：为什么这个方案能拿分</a>
+      <a class="lvl-2" href="#sec-4">3. 系统架构</a>
+      <a class="lvl-2" href="#sec-5">4. 部署方案（EdgeOne Makers 实录）</a>
+      <a class="lvl-3" href="#sec-6">4.1 为什么选 EdgeOne Makers</a>
+      <a class="lvl-3" href="#sec-7">4.2 项目结构（标准 EdgeOne Makers 约定）</a>
+      <a class="lvl-3" href="#sec-8">4.3 实际部署流程（CLI）</a>
+      <a class="lvl-3" href="#sec-9">4.4 踩坑与解决（答辩可讲的"真实工程细节"）</a>
+      <a class="lvl-3" href="#sec-10">4.5 自定义域名（正式访问入口）</a>
+      <a class="lvl-3" href="#sec-11">4.6 环境变量（后续接模型/KV 时）</a>
+      <a class="lvl-2" href="#sec-12">5. WorkBuddy 能力映射（"可复用"的核心）</a>
+      <a class="lvl-3" href="#sec-13">5.1 Expert 包：选题评分官（✅ 已建成并注册）</a>
+      <a class="lvl-3" href="#sec-14">5.2 Skills（✅ 三个均已实现，项目级可复用资产）</a>
+      <a class="lvl-3" href="#sec-15">5.3 Automation（让系统"活"起来）✅ 已实现</a>
+      <a class="lvl-2" href="#sec-16">6. 关键可验证指标（Demo 时现场展示）</a>
+      <a class="lvl-2" href="#sec-17">7. 两周执行计划（个人参赛 · 已过部分作追赶）</a>
+      <a class="lvl-2" href="#sec-18">8. 提交材料清单</a>
+      <a class="lvl-2" href="#sec-19">9. 风险与对策</a>
+      <a class="lvl-2" href="#sec-20">10. 一句话答辩钩子</a>
+    </nav>
+  </aside>
+  <article class="doc-body">
+<blockquote>
+<p>副标题：数据驱动的选题命中系统 · 面向个人创作者的选题命中与多平台发布分析
+命名出处：《易·系辞》「知微知彰」——见微小征兆而预判大势，恰是从数据里读出爆款苗头（原代号「知微 ZhiWei」）
+AI 黑客松 · 命题方向 B（内容创作与发布分析）· 基于 WorkBuddy + EdgeOne Makers 部署</p>
+</blockquote>
+<hr>
+<h2>0. 一句话定位</h2>
+<p><strong>别人的工具帮你&quot;把内容写出来&quot;，知微 ZhiWei帮你&quot;决定写什么最值得写&quot;</strong> —— 基于你自己的历史发布数据 + 实时热点，为每个候选选题打出&quot;预期命中分&quot;，让内容创作从拍脑袋变成数据驱动，并把一篇稿子自动适配到多平台，发布后数据再回流让系统越用越准。</p>
+<hr>
+<h2>1. 我们要解决的真实痛点</h2>
+<p>个人创作者（公众号 / 视频号 / 小红书 / 知乎博主）的真实困境不是&quot;不会写&quot;，而是三件事：</p>
+<table>
+<thead>
+<tr>
+<th>痛点</th>
+<th>现状</th>
+<th>代价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>不知道写什么</strong></td>
+<td>选题靠灵感、靠模仿爆款，命中率靠运气</td>
+<td>产量不低但爆款稀少，投入产出比差</td>
+</tr>
+<tr>
+<td><strong>一稿多改太耗时</strong></td>
+<td>同一篇内容手动改 4~5 个平台版本、单独排版、单独出封面</td>
+<td>每篇多花 1~2 小时在机械适配上</td>
+</tr>
+<tr>
+<td><strong>数据不回流</strong></td>
+<td>发布后各平台数据分散，很少系统复盘</td>
+<td>无法沉淀&quot;什么选题/标题真正有效&quot;的经验</td>
+</tr>
+</tbody></table>
+<p>知微 ZhiWei把这三件事串成一个<strong>自我强化的闭环</strong>：数据回流越多，选题评分越准，命中率越高。</p>
+<hr>
+<h2>2. 命题契合度：为什么这个方案能拿分</h2>
+<p>评审四个硬指标，逐一对齐：</p>
+<table>
+<thead>
+<tr>
+<th>评审维度</th>
+<th>本方案如何满足</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>可运行</strong></td>
+<td><strong>已真实部署到 EdgeOne Makers</strong>（前端页面 + <code>/api/hello</code> 边缘函数跑通），绑定自定义域名 <code>topic.yeranyang.com</code> 稳定访问；WorkBuddy 侧 Skill/Expert/Automation 真实可用</td>
+</tr>
+<tr>
+<td><strong>可验证</strong></td>
+<td>内置&quot;命中率仪表盘&quot;，对比&quot;用系统前 vs 用系统后&quot;的选题命中率、单篇多平台适配耗时、标题打开率，全部量化</td>
+</tr>
+<tr>
+<td><strong>可复用</strong></td>
+<td>核心资产是 WorkBuddy 的 <strong>Expert 包 + Skills + Automation</strong>，任何创作者导入即可用；不是一次性脚本</td>
+</tr>
+<tr>
+<td><strong>真实业务场景</strong></td>
+<td>直接基于真实公众号/多平台运营数据（作者本人长期运营，数据真实、痛点真切）</td>
+</tr>
+</tbody></table>
+<p>一句话：这个方案<strong>同时命中&quot;技术惊艳点&quot;（选题评分）和&quot;完整闭环&quot;（创作→发布→回流→更准）</strong>，且全程可量化、可复用。</p>
+<hr>
+<h2>3. 系统架构</h2>
+<p>四层结构，全部部署在 EdgeOne Makers 同一项目中（Web 与 Agent 共享域名、配置、部署流水线）。</p>
+<p><figure class="doc-figure"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 980" font-family="-apple-system,'PingFang SC','Microsoft YaHei',Segoe UI,Helvetica,Arial,sans-serif">
+  <defs>
+    <style>
+      .title{font-size:22px;font-weight:700;fill:#0F6E56;}
+      .layer{font-size:16px;font-weight:600;fill:#334155;}
+      .cardT{font-size:18px;font-weight:700;}
+      .cardS{font-size:13px;}
+      .flowT{font-size:16px;font-weight:700;fill:#7a2540;}
+      .flowS{font-size:13px;fill:#9d4a63;}
+      .closeT{font-size:17px;font-weight:700;fill:#356a2a;}
+    </style>
+  </defs>
+
+  <!-- Outer container -->
+  <rect x="20" y="20" width="1040" height="940" rx="18" fill="#E1F5EE" stroke="#a9c4ee" stroke-width="1.5"/>
+  <text class="title" x="56" y="66">EdgeOne Makers（同项目部署 · 全球边缘 · 内置模型 50万 token/月）</text>
+
+  <!-- Layer 1 -->
+  <text class="layer" x="56" y="112">① 应用层 · 前端页面 + 对话入口</text>
+  <g>
+    <rect x="56" y="126" width="300" height="88" rx="12" fill="#f0eefc" stroke="#c9bef0" stroke-width="1.5"/>
+    <text class="cardT" x="206" y="164" text-anchor="middle" fill="#1D9E75">选题 Dashboard</text>
+    <text class="cardS" x="206" y="188" text-anchor="middle" fill="#6b5ca8">命中率趋势 / 评分</text>
+
+    <rect x="390" y="126" width="300" height="88" rx="12" fill="#f0eefc" stroke="#c9bef0" stroke-width="1.5"/>
+    <text class="cardT" x="540" y="164" text-anchor="middle" fill="#1D9E75">每日选题简报</text>
+    <text class="cardS" x="540" y="188" text-anchor="middle" fill="#6b5ca8">3 选题 + 拟标题</text>
+
+    <rect x="724" y="126" width="300" height="88" rx="12" fill="#f0eefc" stroke="#c9bef0" stroke-width="1.5"/>
+    <text class="cardT" x="874" y="164" text-anchor="middle" fill="#1D9E75">多平台成稿页</text>
+    <text class="cardS" x="874" y="188" text-anchor="middle" fill="#6b5ca8">一稿 N 版适配</text>
+  </g>
+
+  <!-- Layer 2 -->
+  <text class="layer" x="56" y="262">② 智能层 · WorkBuddy Expert + Skills（可复用核心资产）</text>
+  <g>
+    <rect x="56" y="276" width="300" height="88" rx="12" fill="#e6f6ec" stroke="#a9dcbb" stroke-width="1.5"/>
+    <text class="cardT" x="206" y="314" text-anchor="middle" fill="#1f7a45">Expert 选题评分官</text>
+    <text class="cardS" x="206" y="338" text-anchor="middle" fill="#3c8f60">打分 + 给理由</text>
+
+    <rect x="390" y="276" width="300" height="88" rx="12" fill="#e6f6ec" stroke="#a9dcbb" stroke-width="1.5"/>
+    <text class="cardT" x="540" y="314" text-anchor="middle" fill="#1f7a45">Skill 选题雷达</text>
+    <text class="cardS" x="540" y="338" text-anchor="middle" fill="#3c8f60">热点抓取 + 归纳</text>
+
+    <rect x="724" y="276" width="300" height="88" rx="12" fill="#e6f6ec" stroke="#a9dcbb" stroke-width="1.5"/>
+    <text class="cardT" x="874" y="314" text-anchor="middle" fill="#1f7a45">Skill 多平台改写</text>
+    <text class="cardS" x="874" y="338" text-anchor="middle" fill="#3c8f60">语气 / 长度 / 标签</text>
+  </g>
+
+  <!-- Layer 3 -->
+  <text class="layer" x="56" y="412">③ 数据层 · Serverless API (Functions) + Edge KV</text>
+  <g>
+    <rect x="56" y="426" width="468" height="88" rx="12" fill="#fbf3dc" stroke="#e6d19a" stroke-width="1.5"/>
+    <text class="cardT" x="290" y="464" text-anchor="middle" fill="#8a6a1a">Functions：数据回流 API</text>
+    <text class="cardS" x="290" y="488" text-anchor="middle" fill="#a9862f">录入发布结果 / 互动数据</text>
+
+    <rect x="556" y="426" width="468" height="88" rx="12" fill="#fbf3dc" stroke="#e6d19a" stroke-width="1.5"/>
+    <text class="cardT" x="790" y="464" text-anchor="middle" fill="#8a6a1a">Edge KV：选题历史库</text>
+    <text class="cardS" x="790" y="488" text-anchor="middle" fill="#a9862f">选题 / 标题 / 时间 / 互动</text>
+  </g>
+
+  <!-- Layer 4 -->
+  <text class="layer" x="56" y="562">④ 自动化 · WorkBuddy Automation（定时驱动闭环）</text>
+  <g>
+    <rect x="56" y="576" width="968" height="96" rx="12" fill="#fbe9ef" stroke="#eec1d0" stroke-width="1.5"/>
+    <text class="flowT" x="540" y="618" text-anchor="middle">每日：抓热点 → 评分 → 推简报　　|　　每周：回流数据 → 生成命中率复盘周报</text>
+    <text class="flowS" x="540" y="646" text-anchor="middle">让系统自己转起来，评审看到的是"活的系统"</text>
+  </g>
+
+  <!-- Connector -->
+  <line x1="540" y1="672" x2="540" y2="724" stroke="#94a3b8" stroke-width="2"/>
+
+  <!-- Closed loop -->
+  <rect x="270" y="724" width="540" height="88" rx="12" fill="#e6f6ec" stroke="#a9dcbb" stroke-width="1.5"/>
+  <text class="closeT" x="540" y="776" text-anchor="middle">闭环：数据越用越准 → 选题命中率持续上升（可量化）</text>
+</svg>
+<figcaption>知微 ZhiWei · 四层系统架构（应用层 / 智能层 / 数据层 / 自动化层）</figcaption></figure></p>
+<ul>
+<li><strong>① 应用层</strong>（前端页面 / 对话入口，Pages 托管）：选题 Dashboard（命中率趋势 / 评分）、每日选题简报（3 选题 + 拟标题）、多平台成稿页（一稿 N 版适配）。</li>
+<li><strong>② 智能层</strong>（WorkBuddy Expert + Skills，可复用核心资产）：Expert 选题评分官（打分 + 给理由）、Skill 选题雷达（热点抓取 + 归纳）、Skill 多平台改写（语气 / 长度 / 标签）。</li>
+<li><strong>③ 数据层</strong>（Serverless：Pages Functions + Edge KV）：Functions 数据回流 API（录入发布结果 / 互动数据）、Edge KV 选题历史库（选题 / 标题 / 时间 / 互动）。</li>
+<li><strong>④ 自动化层</strong>（WorkBuddy Automation，定时驱动闭环）：每日抓热点 → 评分 → 推简报；每周回流数据 → 生成命中率复盘周报。</li>
+<li><strong>闭环</strong>：数据越用越准 → 选题命中率持续上升（可量化）。</li>
+</ul>
+<blockquote>
+<p><strong>关键技术决策</strong>：EdgeOne Makers 是边缘 Serverless 环境，<strong>不使用</strong>传统 Node 长驻进程 + 本地 <code>node:sqlite</code>，改用 <strong>Edge KV</strong> 存储选题历史库，数据回流通过 <strong>Pages Functions</strong> 暴露的轻量 API 写入。这是从&quot;本地开发&quot;迁到&quot;边缘部署&quot;必须做的适配。</p>
+</blockquote>
+<hr>
+<h2>4. 部署方案（EdgeOne Makers 实录）</h2>
+<p>本项目已<strong>真实部署到腾讯云 EdgeOne Makers</strong>（黑客松官方指定的技术支持平台），前端页面与动态 API 在同一项目、共享域名与部署流水线。这一节记录真实落地过程与关键决策，答辩时可直接讲&quot;部署是怎么跑通的、遇到什么约束、怎么解决&quot;。</p>
+<h3>4.1 为什么选 EdgeOne Makers</h3>
+<ul>
+<li><strong>黑客松官方技术支持</strong>：每位选手免费 50 万 token/月，可直接调用平台内置大模型，天然契合&quot;接模型做选题评分&quot;的需求。</li>
+<li><strong>一体化部署</strong>：前端页面（Pages 托管）+ 动态 API（Pages Functions / 边缘函数）+ Agent 运行时同项目部署，共享域名，省去多平台拼接。</li>
+<li><strong>全球边缘 + Serverless</strong>：无需自己维护服务器，天然高可用、低延迟。</li>
+</ul>
+<h3>4.2 项目结构（标准 EdgeOne Makers 约定）</h3>
+<pre><code>app/
+├─ index.html              # 前端落地页，一键调用 /api/hello 演示&quot;可运行&quot;
+├─ functions/
+│  └─ api/
+│     └─ hello.js          # 边缘函数，路由 = /api/hello，导出 onRequest 返回 JSON
+├─ package.json            # &quot;type&quot;:&quot;module&quot;（Functions 用 ESM，必须声明）
+└─ dev-server.mjs          # 本地模拟：静态托管 + /functions 路由，用于离线调试
+</code></pre>
+<blockquote>
+<p><strong>路由约定</strong>：<code>functions/</code> 目录即路由表，<code>functions/api/hello.js</code> 自动映射到 <code>/api/hello</code>；函数导出 <code>onRequest(context)</code> 返回标准 <code>Response</code>。静态站点根目录放 <code>index.html</code>。</p>
+</blockquote>
+<h3>4.3 实际部署流程（CLI）</h3>
+<pre><code class="language-bash"># 1. 安装 EdgeOne CLI
+npm i -g edgeone
+
+# 2. 用 API Token 登录（浏览器授权亦可；特殊环境走 Token）
+edgeone login --site china --token &lt;API_TOKEN&gt;
+
+# 3. 部署到 global 区域（含中国大陆加速），拿机读结果
+edgeone makers deploy ./ -n topic-compass -t &lt;API_TOKEN&gt; -a global --json
+</code></pre>
+<p>部署成功后返回项目 ID 与预览链接。<strong>已验证</strong>：前端页面 + <code>/api/hello</code> 边缘函数在 EdgeOne 上真实跑通。</p>
+<h3>4.4 踩坑与解决（答辩可讲的&quot;真实工程细节&quot;）</h3>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>现象</th>
+<th>解决</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ESM 加载失败</strong></td>
+<td>本地/部署时 <code>Unexpected token &#39;export&#39;</code></td>
+<td>被 import 的函数是 ESM，<code>package.json</code> 必须加 <code>&quot;type&quot;:&quot;module&quot;</code>（EdgeOne Functions 本就用 ESM 语法）</td>
+</tr>
+<tr>
+<td><strong>预览链接 401/302</strong></td>
+<td>直接访问根路径鉴权失败</td>
+<td>默认预览链接的 <code>eo_token</code> 是<strong>一次性临时签名</strong>，仅供浏览器内访问，且<strong>含大陆区域时效仅 3 小时</strong>；不适合填问卷/答辩 → 走自定义域名</td>
+</tr>
+<tr>
+<td><strong>区域与备案耦合</strong></td>
+<td>含大陆加速的域名要求 ICP 备案</td>
+<td>见 4.5：用<strong>已备案</strong>域名走 global，或用未备案域名走 overseas</td>
+</tr>
+</tbody></table>
+<h3>4.5 自定义域名（正式访问入口）</h3>
+<p>临时预览链接有时效、且带签名参数，不适合作为答辩/问卷入口。正解是<strong>绑定自定义域名</strong>，得到干净、稳定、无时效的正式地址。</p>
+<p><strong>关键前置：区域 ↔ 备案</strong></p>
+<table>
+<thead>
+<tr>
+<th>部署区域</th>
+<th>域名备案要求</th>
+<th>预览/访问时效</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>global（含中国大陆加速）</strong></td>
+<td>域名<strong>必须已 ICP 备案</strong></td>
+<td>默认预览链接 3 小时</td>
+<td>大陆用户可直接访问，评审无地域限制</td>
+</tr>
+<tr>
+<td><strong>overseas（不含大陆）</strong></td>
+<td><strong>无需备案</strong></td>
+<td>无时效限制</td>
+<td>仅非大陆网络访问</td>
+</tr>
+</tbody></table>
+<p><strong>本项目选择</strong>：使用<strong>已备案</strong>域名 <code>yeranyang.com</code> 的子域 <strong><code>topic.yeranyang.com</code></strong>，保持 <strong>global 区域</strong>部署 —— 大陆内外均可访问、无时效、专业形象好。</p>
+<p><strong>绑定步骤（控制台，CLI 不支持绑域名）</strong>：</p>
+<ol>
+<li>项目控制台 → 「域名管理」→ 「添加自定义域名」，填 <code>topic.yeranyang.com</code>。</li>
+<li>按提示做<strong>归属权验证</strong>（TXT/CNAME 记录）；DNS 在同账号腾讯云 DNSPod，可一键添加解析。</li>
+<li>验证通过后，为 <code>topic</code> 主机记录添加 <strong>CNAME → 控制台给出的目标</strong>（如 <code>xxx.edgeone.cool</code>）。</li>
+<li><strong>申请并绑定免费 HTTPS 证书</strong>（域名添加后不会自动生成，需手动申请 DV 证书，否则 <code>https://</code> 访问失败）。</li>
+<li>确认域名关联「生产环境（production）」，自动指向最新部署。</li>
+</ol>
+<blockquote>
+<p><strong>长期访问保障</strong>：黑客松官方每周一/四生成可长期访问的专用链接；重新部署不影响该专用链接，无需重复提交。若已绑自定义域名，则直接用自定义域名作为对外入口更稳妥。</p>
+</blockquote>
+<h3>4.6 环境变量（后续接模型/KV 时）</h3>
+<p>官方约定：项目使用环境变量（如接内置模型、Edge KV 凭证）时，需<strong>先在控制台「项目设置」添加环境变量，再重新部署一次</strong>才生效。当前骨架未用到，进入数据层/智能层时按此配置。</p>
+<hr>
+<h2>5. WorkBuddy 能力映射（&quot;可复用&quot;的核心）</h2>
+<p>这是本方案区别于普通 Demo 的关键 —— 交付的不是代码，而是<strong>一套任何创作者可导入复用的 WorkBuddy 资产</strong>：</p>
+<h3>5.1 Expert 包：选题评分官（✅ 已建成并注册）</h3>
+<ul>
+<li><strong>职责</strong>：输入候选选题清单 + 历史数据摘要 + 当下热点，输出每个选题的&quot;预期命中分（0-100）+ 打分理由 + 建议标题&quot;。</li>
+<li><strong>评分逻辑</strong>：与后端 <code>analytics.js</code> 完全一致的可解释 rubric（基线 40 分 → 关键词维度 +30 / 时段维度 ±10 / 标题特征 ±；判定：≥75 强推·60-74 可做·45-59 谨慎·&lt;45 不建议）。</li>
+<li><strong>系统联动</strong>：Expert 会调用线上 <code>GET /api/stats</code> 取历史规律、<code>POST /api/score</code> 取评分，把机器结果翻译成人话建议——<strong>不是空壳提示词，而是与系统真联动的智能层</strong>。</li>
+<li><strong>复用性</strong>：人设 + 评分 rubric + 数据接口调用方式固化在 Expert 包（<code>my-experts/plugins/topic-scorer</code>），任何创作者导入即用。</li>
+<li><strong>落地状态</strong>：已按 WorkBuddy 专家规范生成（plugin.json + agent md + 头像），校验通过并注册进 marketplace，专家中心可见。</li>
+</ul>
+<h3>5.2 Skills（✅ 三个均已实现，项目级可复用资产）</h3>
+<p>沉淀在项目 <code>.workbuddy/skills/</code> 下，团队共享、导入即用，正好对接系统三个环节：</p>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>环节</th>
+<th>输入</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>选题雷达</strong> <code>topic-radar</code></td>
+<td>输入</td>
+<td>账号领域关键词</td>
+<td>结构化候选选题清单（topic/keywords/标题/角度/来源）+ 可直接喂 <code>/api/score</code> 的 JSON</td>
+</tr>
+<tr>
+<td><strong>多平台改写</strong> <code>multi-platform-rewrite</code></td>
+<td>输出</td>
+<td>一篇原稿 + 目标平台</td>
+<td>公众号/视频号/小红书/知乎各版标题/正文/标签/封面文案（附可扩展平台规则库）</td>
+</tr>
+<tr>
+<td><strong>命中率复盘</strong> <code>hit-rate-review</code></td>
+<td>回流</td>
+<td>系统 <code>/api/stats</code> 历史数据</td>
+<td>复盘周报：命中率趋势 + 有效模式提炼 + 下周建议（也是每周 Automation 执行体）</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>三个 Skill 首尾相接构成闭环</strong>：选题雷达产候选 → 评分官打分选定 → 多平台改写产出成品 → 发布后数据回流 → 命中率复盘提炼规律，反哺下一轮选题。</p>
+</blockquote>
+<h3>5.3 Automation（让系统&quot;活&quot;起来）✅ 已实现</h3>
+<p>已在 WorkBuddy 注册<strong>两个定时任务</strong>，共用一个纯本地执行体（<code>app/scripts/generate-reports.mjs</code>，复用分析引擎 + 历史数据，不依赖线上 KV，稳定可跑）：</p>
+<table>
+<thead>
+<tr>
+<th>定时任务</th>
+<th>频率</th>
+<th>产出物</th>
+<th>附加动作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>每日选题简报</strong></td>
+<td>每天 08:30</td>
+<td><code>reports/daily-brief-&lt;日期&gt;.md</code>（Top3 高分选题 + 拟标题 + 命中理由）</td>
+<td>自动读取并生成一句话晨间推送摘要</td>
+</tr>
+<tr>
+<td><strong>每周命中率复盘</strong></td>
+<td>每周一 09:00</td>
+<td><code>reports/weekly-review-&lt;日期&gt;.md</code>（高置信关键词 / 时段规律 / 标题规律 / 减法建议）</td>
+<td>自动生成周一晨会式数据简报摘要</td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>数据严谨性</strong>：周报关键词按「命中率 × 样本量」的<strong>置信度排序</strong>，避免只出现一次的偶然高命中词误导决策（<code>AI工具 70% n=10 ★★★</code> 排在 <code>副业 100% n=1 ★☆☆</code> 之前）。</li>
+<li><strong>平滑升级</strong>：执行体数据源优先级为「回流数据 <code>data/posts.json</code> &gt; 种子数据」——KV 就绪后把线上数据同步到 <code>posts.json</code> 即可无缝切换，无需改脚本。</li>
+<li>这一层是答辩时的杀手锏：评审看到的不是静态 Demo，而是<strong>一个自己会转、每天/每周自动产出物料的系统</strong>。</li>
+</ul>
+<hr>
+<h2>6. 关键可验证指标（Demo 时现场展示）</h2>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>定义</th>
+<th>展示方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>选题命中率</strong></td>
+<td>高互动内容占总产出比例（前 vs 后）</td>
+<td>Dashboard 折线图</td>
+</tr>
+<tr>
+<td><strong>多平台适配耗时</strong></td>
+<td>单篇适配到全平台的分钟数（手动 vs 系统）</td>
+<td>对比数字卡片</td>
+</tr>
+<tr>
+<td><strong>标题打开率</strong></td>
+<td>系统拟标题 vs 原标题的打开率</td>
+<td>对比柱状图</td>
+</tr>
+<tr>
+<td><strong>爆款预测准确率</strong></td>
+<td>高分选题实际成为高互动的比例</td>
+<td>混淆矩阵/命中统计</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>数据来源诚实性</strong>：黑客松周期内可用作者真实历史数据做冷启动；若样本不足，明确标注为&quot;基于 N 篇历史 + 模拟增量&quot;，绝不虚构爆款数据（符合可验证原则）。</p>
+</blockquote>
+<hr>
+<h2>7. 两周执行计划（个人参赛 · 已过部分作追赶）</h2>
+<blockquote>
+<p>当前时间 2026-07-18，提交截止 2026-07-26，实际可用约 8 天。计划按&quot;先跑通闭环，再补精度&quot;排序。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>天数</th>
+<th>交付物</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>D1 骨架</strong></td>
+<td>1 天</td>
+<td>EdgeOne Makers 项目初始化，前端页面 + Pages Functions Hello API 跑通并部署上线</td>
+<td>✅ 已完成（已部署；<code>https://topic.yeranyang.com</code> 证书已签发、HTTPS 正式可用、无时效）</td>
+</tr>
+<tr>
+<td><strong>D2-3 数据层</strong></td>
+<td>2 天</td>
+<td>Edge KV 选题历史库结构设计 + 数据回流 API + 导入作者真实历史数据</td>
+<td>🟡 进行中（本地已全跑通；线上待 KV 审批通过后绑定 <code>TOPIC_KV</code> 重部署灌数据）</td>
+</tr>
+<tr>
+<td><strong>D4-5 智能层</strong></td>
+<td>2 天</td>
+<td>WorkBuddy 侧建 Expert 选题评分官 + 选题雷达/多平台改写/命中率复盘 Skills，接内置模型</td>
+<td>✅ 已完成（Expert 已注册；3 个 Skill 已落地项目 skills 目录）</td>
+</tr>
+<tr>
+<td><strong>D6 应用层</strong></td>
+<td>1 天</td>
+<td>答辩级数据驾驶舱 Dashboard（KPI 条 + 现场评分 + 时段热力 + 关键词 + 选题排名 + 闭环流程），已部署上线</td>
+<td>✅ 已完成（含「实时 API 优先 / 快照兜底」优雅降级，KV 未就绪也能完整演示）</td>
+</tr>
+<tr>
+<td><strong>D7 自动化+验证</strong></td>
+<td>1 天</td>
+<td>配置 Automation 定时任务；跑出命中率对比数据</td>
+<td>🟡 进行中（两个定时任务已注册并跑通产出简报/周报；命中率对比待接线上数据）</td>
+</tr>
+<tr>
+<td><strong>D8 打磨提交</strong></td>
+<td>1 天</td>
+<td>录 Demo、写提交材料、填 EdgeOne 预览链接问卷、提交</td>
+<td>待办</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>8. 提交材料清单</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> <strong>可访问的 EdgeOne Makers 部署</strong>（已部署，自定义域名 <code>topic.yeranyang.com</code> 绑定中）</li>
+<li><input disabled="" type="checkbox"> <strong>项目方案书</strong>（本文档）</li>
+<li><input disabled="" type="checkbox"> <strong>Demo 视频</strong>（3-5 分钟，突出闭环 + 命中率对比）</li>
+<li><input checked="" disabled="" type="checkbox"> <strong>WorkBuddy 资产包</strong>（Expert 选题评分官已注册 + 3 个项目级 Skill + 2 个定时 Automation，体现可复用）</li>
+<li><input disabled="" type="checkbox"> <strong>README / 部署说明</strong>（他人可复现）</li>
+<li><input disabled="" type="checkbox"> <strong>命中率验证数据截图</strong>（可验证证据）</li>
+</ul>
+<hr>
+<h2>9. 风险与对策</h2>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>对策</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>历史数据样本不足，评分说服力弱</td>
+<td>冷启动用作者真实数据 + 明确标注模拟增量；重点演示&quot;闭环机制&quot;而非绝对数值</td>
+</tr>
+<tr>
+<td>EdgeOne 边缘环境与本地开发差异（无长驻进程/本地 sqlite）</td>
+<td>已在架构中改用 Edge KV + Functions，D1 优先跑通链路</td>
+</tr>
+<tr>
+<td>50万 token/月额度</td>
+<td>评分/改写为短请求，额度充足；批量任务加缓存避免重复调用</td>
+</tr>
+<tr>
+<td>8 天时间紧</td>
+<td>先跑通端到端闭环（哪怕精度粗糙），再迭代评分质量</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>10. 一句话答辩钩子</h2>
+<blockquote>
+<p>&quot;市面上的 AI 内容工具都在抢着帮你<strong>写</strong>，但真正决定一个创作者成败的，是<strong>写什么</strong>。知微 ZhiWei用你自己的数据回答这个问题，而且它会随着你每一次发布，变得越来越懂你。&quot;</p>
+</blockquote>
+
+  </article>
+</div>
+
+<footer id="footer"></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

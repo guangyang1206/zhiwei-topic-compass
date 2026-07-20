@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>命中率复盘周报 · 知微 ZhiWei</title>
+<meta name="description" content="由 WorkBuddy Automation 每周自动生成 —— 从历史发布数据中提炼「有效模式」，用 Wilson 置信下界抑制小样本虚高，指导下周创作。这是「命中率复盘」Skill 的真实产出。">
+<link rel="stylesheet" href="assets/design.css">
+</head>
+<body>
+<header id="nav"></header>
+
+<section class="doc-hero">
+  <div class="container">
+    <div class="doc-kicker">Weekly Hit-Rate Review</div>
+    <h1>命中率复盘周报</h1>
+    <p class="doc-sub">由 WorkBuddy Automation 每周自动生成 —— 从历史发布数据中提炼「有效模式」，用 Wilson 置信下界抑制小样本虚高，指导下周创作。这是「命中率复盘」Skill 的真实产出。</p>
+    <div class="doc-meta"><span class="chip">自动化产出 · 每周一 09:00</span><span class="chip">数据源：31 篇历史发布</span><span class="chip">置信度加权</span></div>
+  </div>
+</section>
+
+<div class="container doc-layout">
+  <aside class="doc-toc">
+    <div class="toc-title">目录 · Contents</div>
+    <nav>
+      <a class="lvl-2" href="#sec-1">一、总览</a>
+      <a class="lvl-2" href="#sec-2">二、高命中关键词 Top（选题往这些方向靠）</a>
+      <a class="lvl-2" href="#sec-3">三、发布时段规律</a>
+      <a class="lvl-2" href="#sec-4">四、标题特征规律</a>
+      <a class="lvl-2" href="#sec-5">五、下周行动建议（系统自动提炼）</a>
+    </nav>
+  </aside>
+  <article class="doc-body">
+<div class="review-kpis" data-reveal-stagger>
+    <div class="rk"><div class="rk-fig" data-count="31">0</div><div class="rk-lbl">历史发布篇数</div></div>
+    <div class="rk"><div class="rk-fig" data-count="10">0</div><div class="rk-lbl">爆款篇数（≥70分位）</div></div>
+    <div class="rk"><div class="rk-fig accent" data-count="32"><span class="unit">%</span></div><div class="rk-lbl">整体命中率</div></div>
+    <div class="rk"><div class="rk-fig" data-count="2801">0</div><div class="rk-lbl">平均互动分</div></div>
+  </div>
+
+  <div class="review-viz" data-reveal>
+    <div class="rv-card">
+      <h3 style="margin-top:0">高命中关键词 · 按置信度排序</h3>
+      <p style="font-size:13.5px;color:var(--ink-subtle);margin:0 0 14px">采用 Wilson score 置信下界：样本越少、越向保守值收缩，避免「1 篇 100%」的偶然高命中误导选题。</p>
+      <div class="kwc-row">
+      <div class="kwc-key">避坑</div>
+      <div class="kwc-track"><i style="width:100%"></i></div>
+      <div class="kwc-meta">命中100% · 置信44% · <span class="tag ok">n=3 样本充足</span></div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">AI工具</div>
+      <div class="kwc-track"><i style="width:91%"></i></div>
+      <div class="kwc-meta">命中70% · 置信40% · <span class="tag ok">n=10 样本充足</span></div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">提示词</div>
+      <div class="kwc-track"><i style="width:78%"></i></div>
+      <div class="kwc-meta">命中100% · 置信34% · <span class="tag arch">n=2 样本偏少</span></div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">副业</div>
+      <div class="kwc-track"><i style="width:47%"></i></div>
+      <div class="kwc-meta">命中100% · 置信21% · <span class="tag road">n=1 样本不足</span></div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">自媒体</div>
+      <div class="kwc-track"><i style="width:47%"></i></div>
+      <div class="kwc-meta">命中100% · 置信21% · <span class="tag road">n=1 样本不足</span></div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">复盘</div>
+      <div class="kwc-track"><i style="width:47%"></i></div>
+      <div class="kwc-meta">命中100% · 置信21% · <span class="tag road">n=1 样本不足</span></div>
+    </div>
+    </div>
+    <div class="rv-card">
+      <h3 style="margin-top:0">发布时段命中率</h3>
+      <p style="font-size:13.5px;color:var(--ink-subtle);margin:0 0 14px">晚间是绝对高地，深夜/午间为低效时段。</p>
+      <div class="kwc-row">
+      <div class="kwc-key">晚间</div>
+      <div class="kwc-track"><i class="hit" style="width:100%"></i></div>
+      <div class="kwc-meta">63% · n=16</div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">下午</div>
+      <div class="kwc-track"><i class="hit" style="width:3%"></i></div>
+      <div class="kwc-meta">0% · n=2</div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">午间</div>
+      <div class="kwc-track"><i class="hit" style="width:3%"></i></div>
+      <div class="kwc-meta">0% · n=5</div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">深夜</div>
+      <div class="kwc-track"><i class="hit" style="width:3%"></i></div>
+      <div class="kwc-meta">0% · n=7</div>
+    </div>
+<div class="kwc-row">
+      <div class="kwc-key">上午</div>
+      <div class="kwc-track"><i class="hit" style="width:3%"></i></div>
+      <div class="kwc-meta">0% · n=1</div>
+    </div>
+    </div>
+  </div>
+<blockquote>
+<p>由「知微 ZhiWei」自动生成 —— 从历史发布数据中提炼「有效模式」，指导下周创作。</p>
+</blockquote>
+<p><strong>数据源</strong>：种子数据 seed.mjs（KV 就绪后自动切换为线上回流数据）</p>
+<h2>一、总览</h2>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>数值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>历史发布篇数</td>
+<td>31</td>
+</tr>
+<tr>
+<td>爆款篇数（≥70分位）</td>
+<td>10</td>
+</tr>
+<tr>
+<td><strong>命中率</strong></td>
+<td><strong>32%</strong></td>
+</tr>
+<tr>
+<td>爆款阈值</td>
+<td>4490 分</td>
+</tr>
+<tr>
+<td>平均互动分</td>
+<td>2801</td>
+</tr>
+</tbody></table>
+<h2>二、高命中关键词 Top（选题往这些方向靠）</h2>
+<blockquote>
+<p>按「置信度」排序：命中率 × 样本量权重，避免只出现一次的偶然高命中词误导决策。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>关键词</th>
+<th>命中率</th>
+<th>样本数</th>
+<th>平均分</th>
+<th>置信度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>避坑</td>
+<td>100%</td>
+<td>3</td>
+<td>5903</td>
+<td>★★★</td>
+</tr>
+<tr>
+<td>AI工具</td>
+<td>70%</td>
+<td>10</td>
+<td>4927</td>
+<td>★★★</td>
+</tr>
+<tr>
+<td>提示词</td>
+<td>100%</td>
+<td>2</td>
+<td>4862</td>
+<td>★★☆</td>
+</tr>
+<tr>
+<td>副业</td>
+<td>100%</td>
+<td>1</td>
+<td>6729</td>
+<td>★☆☆</td>
+</tr>
+<tr>
+<td>自媒体</td>
+<td>100%</td>
+<td>1</td>
+<td>6077</td>
+<td>★☆☆</td>
+</tr>
+<tr>
+<td>复盘</td>
+<td>100%</td>
+<td>1</td>
+<td>6077</td>
+<td>★☆☆</td>
+</tr>
+<tr>
+<td>标题</td>
+<td>100%</td>
+<td>1</td>
+<td>5835</td>
+<td>★☆☆</td>
+</tr>
+<tr>
+<td>爆款</td>
+<td>100%</td>
+<td>1</td>
+<td>5835</td>
+<td>★☆☆</td>
+</tr>
+</tbody></table>
+<h2>三、发布时段规律</h2>
+<table>
+<thead>
+<tr>
+<th>时段</th>
+<th>命中率</th>
+<th>样本数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>晚间</td>
+<td>63%</td>
+<td>16</td>
+</tr>
+<tr>
+<td>下午</td>
+<td>0%</td>
+<td>2</td>
+</tr>
+<tr>
+<td>午间</td>
+<td>0%</td>
+<td>5</td>
+</tr>
+<tr>
+<td>深夜</td>
+<td>0%</td>
+<td>7</td>
+</tr>
+<tr>
+<td>上午</td>
+<td>0%</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<h2>四、标题特征规律</h2>
+<table>
+<thead>
+<tr>
+<th>标题特征</th>
+<th>命中率</th>
+<th>样本数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>含数字</td>
+<td>57%</td>
+<td>14</td>
+</tr>
+<tr>
+<td>含疑问</td>
+<td>50%</td>
+<td>2</td>
+</tr>
+<tr>
+<td>含冒号</td>
+<td>50%</td>
+<td>2</td>
+</tr>
+<tr>
+<td>含痛点/情绪词</td>
+<td>80%</td>
+<td>5</td>
+</tr>
+</tbody></table>
+<h2>五、下周行动建议（系统自动提炼）</h2>
+<ol>
+<li><strong>选题方向</strong>：向高命中关键词靠拢 —— 避坑、AI工具、提示词。</li>
+<li><strong>发布时段</strong>：优先「晚间」（命中率 63%），避开表现差的时段。</li>
+<li><strong>标题打法</strong>：带数字标题命中率 57%、带痛点/情绪词命中率 80%，可组合使用。</li>
+<li><strong>减法</strong>：泛泛而谈 / 情绪碎碎念 / 无干货蹭热点类选题命中率低，本周应减少。</li>
+</ol>
+<hr>
+
+  </article>
+</div>
+
+<footer id="footer"></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

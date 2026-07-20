@@ -181,9 +181,11 @@ function pct(x) { return Math.round(x * 100) + '%'; }
 
 // 置信度加权：命中率 × log 样本量因子 —— 让高样本关键词更靠前，
 // 避免「只出现 1 次的 100% 命中词」误导选题决策（数据严谨性）。
+// 统一采用引擎输出的 Wilson score 置信下界（analyze() 已计算 k.confidence），
+// 与打分引擎、Dashboard 同源，保证全站置信度口径一致。
 function rankByConfidence(keywords) {
   return [...keywords]
-    .map(k => ({ ...k, _conf: k.hitRate * Math.log2(k.count + 1) }))
+    .map(k => ({ ...k, _conf: k.confidence != null ? k.confidence : k.hitRate * Math.log2(k.count + 1) }))
     .sort((a, b) => b._conf - a._conf || b.avgScore - a.avgScore);
 }
 function confBadge(count) {

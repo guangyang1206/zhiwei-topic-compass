@@ -212,10 +212,37 @@
     });
   }
 
+  /* ---- TOC scrollspy (仅文档页存在 .doc-toc 时生效) ---- */
+  function initTOC() {
+    var toc = document.querySelector('.doc-toc');
+    if (!toc) return;
+    var links = [].slice.call(toc.querySelectorAll('a[href^="#"]'));
+    if (!links.length) return;
+    var map = {};
+    var targets = [];
+    links.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      var sec = document.getElementById(id);
+      if (sec) { map[id] = a; targets.push(sec); }
+    });
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          var a = map[e.target.id];
+          if (a) a.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+    targets.forEach(function (s) { io.observe(s); });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     buildNav();
     buildFooter();
     initMotion();
     initMagnetic();
+    initTOC();
   });
 })();

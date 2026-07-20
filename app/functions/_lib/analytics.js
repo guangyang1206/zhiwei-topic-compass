@@ -89,7 +89,24 @@ function percentile(sortedAsc, q) {
   return sortedAsc[idx];
 }
 
-/** 按某个「多值维度」（如关键词数组）统计命中率 */
+/**
+ * Wilson score 命中率置信下界（95%）。
+ * 这是产品「可信度」的核心：样本越小，越向保守值收缩。
+ * 例：命中3/3 裸命中率=100%，但 Wilson 下界≈44%（诚实反映"只有3个样本"）；
+ *     命中10/10 时下界≈72%，比 3/3 更可信。
+ * 让创作者不被 "1篇就100%" 的假高命中率误导。
+ */
+export function wilsonLower(hit, count, z = 1.96) {
+  if (!count) return 0;
+  const p = hit / count;
+  const z2 = z * z;
+  const denom = 1 + z2 / count;
+  const center = p + z2 / (2 * count);
+  const margin = z * Math.sqrt((p * (1 - p) + z2 / (4 * count)) / count);
+  return Math.max(0, (center - margin) / denom);
+}
+
+/** 按某个「多值维度」（如关键词数组）统计命中率 + 置信度 */
 function groupHitRate(posts, keyFn) {
   const map = new Map();
   for (const p of posts) {
@@ -106,10 +123,12 @@ function groupHitRate(posts, keyFn) {
       count: e.count,
       hit: e.hit,
       hitRate: +(e.hit / e.count).toFixed(3),
+      confidence: +wilsonLower(e.hit, e.count).toFixed(3), // 置信下界：小样本自动打折
       avgScore: Math.round(e.scoreSum / e.count),
     }))
     .filter(e => e.count >= 1)
-    .sort((a, b) => b.hitRate - a.hitRate || b.avgScore - a.avgScore);
+    // 按置信度排序（而非裸命中率）：n=3 的 100% 排在 n=1 的 100% 前面
+    .sort((a, b) => b.confidence - a.confidence || b.avgScore - a.avgScore);
 }
 
 function titleFeatureHitRate(posts) {
@@ -137,27 +156,36 @@ export function scoreCandidates(candidates, model) {
     const reasons = [];
     let score = 40; // 基线分
 
-    // 1) 关键词匹配历史高命中词
+    // 1) 关键词匹配历史高命中词 —— 用置信下界(confidence)而非裸命中率，避免小样本虚高
     const kws = c.keywords && c.keywords.length ? c.keywords : autoKeywords(c.topic);
-    let kwBoost = 0, matched = [];
+    let kwBoost = 0, matched = [], weakMatched = [];
     for (const kw of kws) {
       const stat = kwMap.get(kw);
-      if (stat && stat.hitRate > baseline) {
-        const delta = Math.round((stat.hitRate - baseline) * 60);
-        kwBoost += delta; matched.push(`${kw}(命中率${pct(stat.hitRate)})`);
+      if (!stat) continue;
+      const conf = stat.confidence != null ? stat.confidence : stat.hitRate;
+      if (conf > baseline) {
+        // 加权幅度由「置信下界」决定：样本足、命中稳的词加得多；1篇的高命中加得少
+        const delta = Math.round((conf - baseline) * 60);
+        kwBoost += delta;
+        matched.push(`${kw}(命中率${pct(stat.hitRate)}·置信${pct(conf)}·n=${stat.count})`);
+      } else if (stat.hitRate > baseline && stat.count < 3) {
+        // 裸命中率高但样本不足：作为「潜力信号」提示，但不给分或少给分
+        weakMatched.push(`${kw}(命中率${pct(stat.hitRate)}但仅n=${stat.count}，样本不足待验证)`);
       }
     }
-    if (kwBoost) { score += Math.min(30, kwBoost); reasons.push(`选题关键词踩中历史高命中主题：${matched.join('、')}`); }
-    else reasons.push('选题关键词与历史高命中主题重合度低，命中不确定性较高');
+    if (kwBoost) { score += Math.min(30, kwBoost); reasons.push(`选题关键词踩中历史高命中主题（已按样本量做置信度加权）：${matched.join('、')}`); }
+    if (weakMatched.length) reasons.push(`潜力信号（样本不足，未计入高分）：${weakMatched.join('、')}`);
+    if (!kwBoost && !weakMatched.length) reasons.push('选题关键词与历史高命中主题重合度低，命中不确定性较高');
 
     // 2) 发布时段
     const tb = c.plannedTime ? timeBucket(c.plannedTime) : null;
     if (tb) {
       const stat = timeMap.get(tb);
-      if (stat && stat.hitRate > baseline) {
-        score += 10; reasons.push(`计划发布时段「${zhTime(tb)}」历史命中率 ${pct(stat.hitRate)}，优于平均`);
+      const tConf = stat ? (stat.confidence != null ? stat.confidence : stat.hitRate) : null;
+      if (stat && tConf > baseline) {
+        score += 10; reasons.push(`计划发布时段「${zhTime(tb)}」历史命中率 ${pct(stat.hitRate)}（n=${stat.count}），优于平均`);
       } else if (stat) {
-        score -= 5; reasons.push(`计划发布时段「${zhTime(tb)}」历史表现偏弱，建议换时段`);
+        score -= 5; reasons.push(`计划发布时段「${zhTime(tb)}」历史表现偏弱（命中率${pct(stat.hitRate)}，n=${stat.count}），建议换时段`);
       }
     }
 
@@ -165,8 +193,8 @@ export function scoreCandidates(candidates, model) {
     if (c.plannedTitle) {
       const f = titleFeatures(c.plannedTitle);
       const tf = model.byTitle || {};
-      if (f.hasPain && tf.hasPain && tf.hasPain.hitRate > baseline) { score += 8; reasons.push('标题含痛点/情绪词，历史此类标题命中率更高'); }
-      if (f.hasNumber && tf.hasNumber && tf.hasNumber.hitRate > baseline) { score += 5; reasons.push('标题含数字，历史此类标题更易命中'); }
+      if (f.hasPain && tf.hasPain && tf.hasPain.hitRate > baseline) { score += 8; reasons.push(`标题含痛点/情绪词，历史此类标题命中率更高（${pct(tf.hasPain.hitRate)}）`); }
+      if (f.hasNumber && tf.hasNumber && tf.hasNumber.hitRate > baseline) { score += 5; reasons.push(`标题含数字，历史此类标题更易命中（${pct(tf.hasNumber.hitRate)}）`); }
       if (f.len > 30) { score -= 4; reasons.push('标题偏长（>30 字），建议精简'); }
     } else {
       reasons.push('未提供拟定标题，建议补充以获得标题维度评分');
