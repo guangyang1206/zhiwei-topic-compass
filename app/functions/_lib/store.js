@@ -51,7 +51,12 @@ export function createStore(backend) {
       let cursor;
       // 防御式循环上限，避免异常游标导致死循环
       for (let i = 0; i < 1000; i++) {
-        const res = await backend.list({ prefix, limit: 256, cursor });
+        // 注意（踩坑）：生产 EdgeOne KV 的 list() 对 cursor 做严格类型校验，
+        // cursor 为 undefined 会抛 "cursor type invalid. expect: 'string'"。
+        // 因此首页不传 cursor 字段，只有拿到游标后才带上。
+        const opts = { prefix, limit: 256 };
+        if (cursor) opts.cursor = cursor;
+        const res = await backend.list(opts);
         const keys = (res && res.keys) || [];
         for (const k of keys) out.push(typeof k === 'string' ? k : k.key);
         if (!res || res.complete || !res.cursor) break;

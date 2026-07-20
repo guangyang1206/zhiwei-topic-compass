@@ -23,8 +23,7 @@ export async function onRequest({ request, env }) {
 
     return ok({ summary, byTopic });
   } catch (e) {
-    // 临时：把真实错误暴露出来定位 545
-    return fail('stats 运行时错误: ' + (e && e.message ? e.message : String(e)) + ' | stack: ' + (e && e.stack ? String(e.stack).slice(0, 300) : 'n/a'), 500);
+    return fail('stats 运行时错误: ' + (e && e.message ? e.message : String(e)), 500);
   }
 }
 
