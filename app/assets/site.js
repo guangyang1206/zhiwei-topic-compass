@@ -1,12 +1,13 @@
 /* ============================================================
-   TopicCompass — shared site behaviour
+   知微 ZhiWei — shared site behaviour
    - injects nav + footer (single source of truth)
    - language toggle (zh / en) via <html data-lang>
    - theme toggle (light / dark) via <html data-theme>
-   - persists both in localStorage
+   - motion engine: scroll-reveal / countUp / bar draw-in / magnetic
+   Motion serves data storytelling — never decoration for its own sake.
    ============================================================ */
 (function () {
-  var LANG_KEY = 'tc_lang', THEME_KEY = 'tc_theme';
+  var LANG_KEY = 'zw_lang', THEME_KEY = 'zw_theme';
   var root = document.documentElement;
 
   /* ---- restore preferences early ---- */
@@ -15,23 +16,20 @@
   root.setAttribute('data-lang', savedLang);
   root.setAttribute('data-theme', savedTheme);
 
+  /* ---- 5-page streamlined nav ---- */
   var PAGES = [
     { href: 'index.html',     zh: '首页',   en: 'Home' },
     { href: 'product.html',   zh: '产品',   en: 'Product' },
-    { href: 'solution.html',  zh: '解决方案', en: 'Solutions' },
     { href: 'dashboard.html', zh: '实时看板', en: 'Dashboard' },
     { href: 'docs.html',      zh: '文档',   en: 'Docs' },
-    { href: 'blog.html',      zh: 'Blog',  en: 'Blog' },
-    { href: 'resources.html', zh: '资源',   en: 'Resources' },
-    { href: 'about.html',     zh: '关于',   en: 'About' }
+    { href: 'blog.html',      zh: 'Blog',  en: 'Blog' }
   ];
-  var GITHUB = 'https://github.com/guangyang1206/topic-compass';
+  var GITHUB = 'https://github.com/guangyang1206/zhiwei-topic-compass';
 
   function current() {
     var p = location.pathname.split('/').pop();
     return (!p || p === '') ? 'index.html' : p;
   }
-
   function t(o) { return '<span data-lang-zh>' + o.zh + '</span><span data-lang-en>' + o.en + '</span>'; }
 
   /* ---- NAV ---- */
@@ -56,8 +54,8 @@
           '<button class="icon-btn" id="langBtn" title="切换语言 / Language">' + (savedLang === 'zh' ? 'EN' : '中') + '</button>' +
           '<button class="icon-btn" id="themeBtn" title="切换主题 / Theme">' + themeIcon() + '</button>' +
           '<a class="icon-btn" href="' + GITHUB + '" target="_blank" rel="noopener" title="GitHub">' + ghIcon() + '</a>' +
-          '<a class="btn btn-primary" href="dashboard.html" style="margin-left:4px" data-lang-zh>看板</a>' +
-          '<a class="btn btn-primary" href="dashboard.html" style="margin-left:4px" data-lang-en>Dashboard</a>' +
+          '<a class="btn btn-primary magnetic" href="dashboard.html" style="margin-left:4px" data-lang-zh>看板</a>' +
+          '<a class="btn btn-primary magnetic" href="dashboard.html" style="margin-left:4px" data-lang-en>Dashboard</a>' +
           '<button class="icon-btn nav-toggle" id="navToggle" title="Menu">☰</button>' +
         '</div>' +
       '</div>';
@@ -69,7 +67,7 @@
     };
   }
 
-  /* ---- FOOTER ---- */
+  /* ---- FOOTER (关于 & 开源 收进页脚) ---- */
   function buildFooter() {
     var host = document.getElementById('footer');
     if (!host) return;
@@ -79,22 +77,23 @@
         '<div class="footer-grid">' +
           '<div>' +
             '<div class="nav-brand" style="margin-bottom:12px">' + logoSVG() + '<span>知微 ZhiWei</span></div>' +
-            '<p class="subtle" style="font-size:14px;max-width:300px" data-lang-zh>数据驱动的选题命中与多平台发布分析。清楚知道边界，架构已预留。</p>' +
-            '<p class="subtle" style="font-size:14px;max-width:300px" data-lang-en>Data-driven topic hit-rate & multi-platform publishing analytics. Honest about boundaries, architected to extend.</p>' +
+            '<p class="subtle" style="font-size:14px;max-width:320px" data-lang-zh>数据驱动的选题命中与多平台发布分析。清楚知道边界，架构已预留。</p>' +
+            '<p class="subtle" style="font-size:14px;max-width:320px" data-lang-en>Data-driven topic hit-rate & multi-platform publishing analytics. Honest about boundaries, architected to extend.</p>' +
           '</div>' +
           '<div><h5>' + t({zh:'产品',en:'Product'}) + '</h5>' +
             '<a href="product.html">' + t({zh:'能力概览',en:'Features'}) + '</a>' +
             '<a href="dashboard.html">' + t({zh:'实时看板',en:'Dashboard'}) + '</a>' +
-            '<a href="solution.html">' + t({zh:'解决方案',en:'Solutions'}) + '</a>' +
+            '<a href="product.html#lines">' + t({zh:'解决方案',en:'Solutions'}) + '</a>' +
           '</div>' +
           '<div><h5>' + t({zh:'资源',en:'Resources'}) + '</h5>' +
             '<a href="docs.html">' + t({zh:'文档',en:'Docs'}) + '</a>' +
             '<a href="blog.html">Blog</a>' +
-            '<a href="resources.html">' + t({zh:'下载',en:'Downloads'}) + '</a>' +
+            '<a href="docs.html#downloads">' + t({zh:'下载',en:'Downloads'}) + '</a>' +
           '</div>' +
-          '<div><h5>' + t({zh:'开源',en:'Open source'}) + '</h5>' +
+          '<div><h5>' + t({zh:'开源 & 关于',en:'Open source & About'}) + '</h5>' +
             '<a href="' + GITHUB + '" target="_blank" rel="noopener">GitHub</a>' +
-            '<a href="about.html">' + t({zh:'关于',en:'About'}) + '</a>' +
+            '<a href="' + GITHUB + '/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>' +
+            '<a href="index.html#story">' + t({zh:'产品理念',en:'Philosophy'}) + '</a>' +
           '</div>' +
         '</div>' +
         '<div class="footer-bottom">' +
@@ -110,7 +109,6 @@
     root.setAttribute('data-lang', savedLang);
     localStorage.setItem(LANG_KEY, savedLang);
     document.getElementById('langBtn').textContent = (savedLang === 'zh') ? 'EN' : '中';
-    document.title = document.title; // unchanged; per-page handles bilingual title if needed
   }
   function toggleTheme() {
     savedTheme = (root.getAttribute('data-theme') === 'dark') ? 'light' : 'dark';
@@ -135,8 +133,89 @@
     return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.08 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>';
   }
 
+  /* ============================================================
+     MOTION ENGINE — serves data storytelling
+     ============================================================ */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* count-up for [data-count] (supports decimals; keeps trailing unit span) */
+  function countUp(el) {
+    if (el.dataset.counted) return;
+    el.dataset.counted = '1';
+    var target = parseFloat(el.getAttribute('data-count'));
+    if (isNaN(target)) return;
+    var decimals = (el.getAttribute('data-count').split('.')[1] || '').length;
+    // ensure a leading text node exists (before any unit span)
+    if (!el.firstChild || el.firstChild.nodeType !== 3) {
+      el.insertBefore(document.createTextNode('0'), el.firstChild || null);
+    }
+    var textNode = el.childNodes[0];
+    var dur = 1100, start = null;
+    function frame(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      textNode.nodeValue = (target * eased).toFixed(decimals);
+      if (p < 1) requestAnimationFrame(frame);
+      else textNode.nodeValue = target.toFixed(decimals);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function initMotion() {
+    var revealEls = [].slice.call(document.querySelectorAll('[data-reveal],[data-reveal-stagger]'));
+    // set stagger index
+    document.querySelectorAll('[data-reveal-stagger]').forEach(function (g) {
+      [].slice.call(g.children).forEach(function (c, i) { c.style.setProperty('--i', i); });
+    });
+
+    if (reduce || !('IntersectionObserver' in window)) {
+      revealEls.forEach(function (el) { el.classList.add('in'); });
+      document.querySelectorAll('[data-count]').forEach(function (el) {
+        var d = (el.getAttribute('data-count').split('.')[1] || '').length;
+        if (!el.firstChild || el.firstChild.nodeType !== 3) el.insertBefore(document.createTextNode(''), el.firstChild || null);
+        el.childNodes[0].nodeValue = parseFloat(el.getAttribute('data-count')).toFixed(d);
+        el.dataset.counted = '1';
+      });
+      return;
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        // count-up any figures inside
+        e.target.querySelectorAll && e.target.querySelectorAll('[data-count]').forEach(countUp);
+        if (e.target.hasAttribute('data-count')) countUp(e.target);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.18, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(function (el) { io.observe(el); });
+    // standalone counters not wrapped in reveal
+    document.querySelectorAll('[data-count]').forEach(function (el) {
+      if (!el.closest('[data-reveal],[data-reveal-stagger]')) io.observe(el);
+    });
+  }
+
+  /* magnetic buttons */
+  function initMagnetic() {
+    if (reduce) return;
+    document.querySelectorAll('.magnetic').forEach(function (el) {
+      el.addEventListener('mousemove', function (ev) {
+        var r = el.getBoundingClientRect();
+        var mx = ev.clientX - r.left - r.width / 2;
+        var my = ev.clientY - r.top - r.height / 2;
+        el.style.transform = 'translate(' + (mx * 0.18) + 'px,' + (my * 0.22) + 'px)';
+      });
+      el.addEventListener('mouseleave', function () { el.style.transform = ''; });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     buildNav();
     buildFooter();
+    initMotion();
+    initMagnetic();
   });
 })();

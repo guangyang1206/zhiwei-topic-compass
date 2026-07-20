@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>知微 ZhiWei · 数据驱动的选题命中系统</title>
+  <title>实时看板 · 知微 ZhiWei</title>
+  <meta name="description" content="知微实时看板：命中率、发布时段热度、关键词置信度、选题评分——数据驱动，眼见为实。">
+  <link rel="stylesheet" href="assets/design.css">
   <style>
+    /* dashboard keeps its own visual system below; nav/footer come from design.css */
     :root {
       --bg:#f5f7fb; --ink:#1f2937; --muted:#64748b; --faint:#94a3b8;
       --brand:#1a3b8b; --brand2:#4a2f9e;
@@ -17,9 +20,9 @@
     body {
       font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",Helvetica,Arial,sans-serif;
       background:radial-gradient(1200px 620px at 82% -12%, #e8f0fb 0%, var(--bg) 55%);
-      color:var(--ink); min-height:100vh; padding:30px 20px 48px;
+      color:var(--ink); min-height:100vh;
     }
-    .wrap { width:100%; max-width:1080px; margin:0 auto; }
+    .wrap { width:100%; max-width:1080px; margin:0 auto; padding:30px 20px 48px; }
 
     /* ---- Header ---- */
     .badge { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--brand);
@@ -129,6 +132,7 @@
   </style>
 </head>
 <body>
+  <header id="nav"></header>
   <div class="wrap">
     <div class="topbar">
       <span class="badge">🧭 AI 黑客松 · 方向 B · 基于 WorkBuddy + EdgeOne Makers</span>
@@ -359,5 +363,7 @@
     }).sort((a,b)=>b.score-a.score);
   }
   </script>
+  <footer id="footer"></footer>
+  <script src="assets/site.js"></script>
 </body>
 </html>

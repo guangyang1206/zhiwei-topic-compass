@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品能力 · 知微 ZhiWei</title>
+<meta name="description" content="知微三大能力详解：选题命中评分、多平台改写适配、舆情偏好分析。个人创作者与品牌市场部两条业务线。">
+<link rel="stylesheet" href="assets/design.css">
+</head>
+<body>
+<header id="nav"></header>
+
+<main>
+  <section class="hero" style="padding-bottom:48px">
+    <div class="hero-mesh"></div>
+    <div class="container" data-reveal-stagger>
+      <div class="eyebrow center" data-lang-zh>产品能力</div>
+      <div class="eyebrow center" data-lang-en>Product</div>
+      <h1 class="center" data-lang-zh>三大能力，<span style="color:var(--accent)">一个数据闭环</span></h1>
+      <h1 class="center" data-lang-en>Three capabilities,<br><span style="color:var(--accent)">one data loop</span></h1>
+      <p class="lead center" style="max-width:640px;margin:20px auto 0" data-lang-zh>每个能力都标注真实状态——已跑通 / 架构已预留 / Roadmap。我们不假装全都真实。</p>
+      <p class="lead center" style="max-width:640px;margin:20px auto 0" data-lang-en>Each capability carries its true status — Live / Architected / Roadmap. We don't pretend.</p>
+    </div>
+  </section>
+
+  <!-- Capability 1 -->
+  <section class="section" id="scoring">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:center;gap:56px" data-reveal>
+        <div>
+          <span class="badge badge-ok" data-lang-zh>已跑通</span><span class="badge badge-ok" data-lang-en>Live</span>
+          <h2 style="margin-top:14px" data-lang-zh>选题命中评分</h2><h2 style="margin-top:14px" data-lang-en>Topic hit-rate scoring</h2>
+          <p class="lead" style="margin-top:14px" data-lang-zh>一个<b>可解释</b>的评分引擎。为每个候选选题给出命中概率评分、最佳发布时段、关键词置信度，并说明「为什么」——不是黑盒打分。</p>
+          <p class="lead" style="margin-top:14px" data-lang-en>An <b>explainable</b> scoring engine. For each candidate it gives hit probability, best time slot, keyword confidence — and the reasons why. Not a black box.</p>
+          <ul style="margin-top:16px;padding-left:18px;color:var(--ink-muted);line-height:2.1">
+            <li data-lang-zh>命中概率评分（0–100）+ 强推 / 建议 / 不建议</li><li data-lang-en>Hit score (0–100) + strong / ok / avoid</li>
+            <li data-lang-zh>最佳发布时段推荐（基于历史命中分布）</li><li data-lang-en>Best time slot (from historical hit distribution)</li>
+            <li data-lang-zh>关键词置信度（含样本量，避免小样本误导）</li><li data-lang-en>Keyword confidence (with sample size)</li>
+          </ul>
+        </div>
+        <div class="card" style="padding:28px">
+          <div class="subtle mono" style="font-size:12px;margin-bottom:12px">POST /api/score</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--hairline)">
+            <div><b data-lang-zh>「AI 工具提示词」</b><b data-lang-en>"AI tool prompts"</b></div>
+            <div class="stat-figure accent" style="font-size:36px" data-count="85"></div>
+          </div>
+          <div class="chip badge-ok" style="margin:12px 0"><span data-lang-zh>强烈推荐 · 建议傍晚发布</span><span data-lang-en>Strongly recommended · post in evening</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--hairline)">
+            <div><b data-lang-zh>「深夜随笔」</b><b data-lang-en>"Late-night essay"</b></div>
+            <div class="stat-figure" style="font-size:36px;color:var(--ink-subtle)" data-count="35"></div>
+          </div>
+          <div class="chip" style="margin-top:12px;color:var(--danger);background:var(--danger-bg)"><span data-lang-zh>不建议 · 深夜时段命中率 0%</span><span data-lang-en>Avoid · 0% hit-rate at night</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Capability 2 -->
+  <section class="section" style="background:var(--surface-1)" id="rewrite">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:center;gap:56px" data-reveal>
+        <div class="card" style="padding:28px">
+          <div class="subtle" style="font-size:13px;margin-bottom:14px" data-lang-zh>同一段内容 → 三平台适配</div>
+          <div class="subtle" style="font-size:13px;margin-bottom:14px" data-lang-en>One draft → three platforms</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="card-flat" style="padding:14px"><b style="color:var(--accent)">微信公众号</b><span class="subtle" style="font-size:13px;display:block;margin-top:4px" data-lang-zh>深度、结构化、专业语气</span><span class="subtle" style="font-size:13px;display:block;margin-top:4px" data-lang-en>In-depth, structured, professional</span></div>
+            <div class="card-flat" style="padding:14px"><b style="color:#ff2d55">小红书</b><span class="subtle" style="font-size:13px;display:block;margin-top:4px" data-lang-zh>emoji、短句、种草口吻、标签</span><span class="subtle" style="font-size:13px;display:block;margin-top:4px" data-lang-en>Emoji, short lines, hooks, tags</span></div>
+            <div class="card-flat" style="padding:14px"><b style="color:var(--violet)">X / LinkedIn</b><span class="subtle" style="font-size:13px;display:block;margin-top:4px" data-lang-zh>英文、简洁有力、话题标签</span><span class="subtle" style="font-size:13px;display:block;margin-top:4px" data-lang-en>English, crisp, hashtags</span></div>
+          </div>
+        </div>
+        <div>
+          <span class="badge badge-ok" data-lang-zh>已跑通</span><span class="badge badge-ok" data-lang-en>Live</span>
+          <h2 style="margin-top:14px" data-lang-zh>多平台改写适配</h2><h2 style="margin-top:14px" data-lang-en>Multi-platform rewrite</h2>
+          <p class="lead" style="margin-top:14px" data-lang-zh>吸收自「一稿多发」痛点：一段内容，一键生成公众号 / 小红书 / 抖音（及海外 X / LinkedIn）风格版本。语气、结构、标签自动适配，改写逻辑不依赖外部 API，稳定可跑。</p>
+          <p class="lead" style="margin-top:14px" data-lang-en>One draft, one click — WeChat / RED / Douyin (and X / LinkedIn) variants. Tone, structure and tags auto-adapt. Rewrite logic needs no external API — stable and runnable.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Capability 3 -->
+  <section class="section" id="sentiment">
+    <div class="container">
+      <div class="grid grid-2" style="align-items:center;gap:56px" data-reveal>
+        <div>
+          <span class="badge badge-arch" data-lang-zh>架构已预留</span><span class="badge badge-arch" data-lang-en>Architected</span>
+          <h2 style="margin-top:14px" data-lang-zh>舆情偏好分析</h2><h2 style="margin-top:14px" data-lang-en>Sentiment & preference</h2>
+          <p class="lead" style="margin-top:14px" data-lang-zh>国内外舆情环境与选题偏好分析。<b>算法框架已就位，数据源适配层已预留</b>——演示用高质量样本数据，真实接入各平台开放接口即可切换，不假装全都真实。</p>
+          <p class="lead" style="margin-top:14px" data-lang-en>Domestic & overseas sentiment and topic-preference analysis. <b>The algorithm framework is ready and the data-source layer is pre-built</b> — demoed with high-quality samples, switchable to real platform APIs. No pretending.</p>
+          <div class="card-flat" style="margin-top:18px;padding:16px;font-size:13px" class="subtle">
+            <b data-lang-zh>诚实说明：</b><b data-lang-en>Honest note: </b>
+            <span class="subtle" data-lang-zh>黑客松周期内真实抓取各平台舆情不可行，我们用结构化种子数据演示，并在架构上预留数据源适配层。</span>
+            <span class="subtle" data-lang-en>Real-time crawling isn't feasible within the hackathon window; we demo with structured seed data and reserve the adapter layer.</span>
+          </div>
+        </div>
+        <div class="card" style="padding:28px" data-reveal>
+          <div class="subtle" style="font-size:13px;margin-bottom:16px" data-lang-zh>选题偏好热度（样本数据）</div>
+          <div class="subtle" style="font-size:13px;margin-bottom:16px" data-lang-en>Topic preference heat (sample)</div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span data-lang-zh>AI 工具 / 效率</span><span data-lang-en>AI tools / productivity</span><b>92</b></div><div class="bar-track"><div class="bar-fill" style="--w:92%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span data-lang-zh>避坑 / 实战经验</span><span data-lang-en>Pitfalls / hands-on</span><b>88</b></div><div class="bar-track"><div class="bar-fill" style="--w:88%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span data-lang-zh>行业观察</span><span data-lang-en>Industry watch</span><b>64</b></div><div class="bar-track"><div class="bar-fill" style="--w:64%"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px"><span data-lang-zh>个人随笔</span><span data-lang-en>Personal essays</span><b>28</b></div><div class="bar-track"><div class="bar-fill" style="--w:28%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Business lines -->
+  <section class="section" style="background:var(--surface-1)" id="lines">
+    <div class="container">
+      <div class="section-head" data-reveal>
+        <div class="eyebrow" data-lang-zh>解决方案</div><div class="eyebrow" data-lang-en>Solutions</div>
+        <h2 data-lang-zh>两条业务线，一套引擎</h2><h2 data-lang-en>Two lines, one engine</h2>
+      </div>
+      <div class="grid grid-2" data-reveal-stagger>
+        <div class="card lift" style="padding:32px">
+          <div class="feat-icon">✍️</div>
+          <h3 data-lang-zh>个人创作者</h3><h3 data-lang-en>Individual creators</h3>
+          <p class="muted" style="margin:10px 0 16px" data-lang-zh>自媒体、内容创业者。把有限精力花在真正会命中的选题上，用数据替代直觉。</p>
+          <p class="muted" style="margin:10px 0 16px" data-lang-en>Independent creators — spend limited energy on topics that land, data over intuition.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">选题评分</span><span class="chip">发布时段</span><span class="chip">一稿多平台</span></div>
+        </div>
+        <div class="card lift" style="padding:32px">
+          <div class="feat-icon">🏢</div>
+          <h3 data-lang-zh>品牌市场部</h3><h3 data-lang-en>Brand marketing teams</h3>
+          <p class="muted" style="margin:10px 0 16px" data-lang-zh>官网文章、品牌宣传、社媒矩阵。统一的数据驱动内容中台，覆盖官网到各社交平台。</p>
+          <p class="muted" style="margin:10px 0 16px" data-lang-en>Website, brand PR, social matrix — a unified content hub from site to every channel.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip">官网内容</span><span class="chip">社媒矩阵</span><span class="chip">GEO 可见性</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="container center" data-reveal>
+      <h2 data-lang-zh>眼见为实，看实时看板</h2><h2 data-lang-en>See it live</h2>
+      <div class="hero-cta"><a class="btn btn-primary btn-lg magnetic" href="dashboard.html"><span data-lang-zh>进入看板</span><span data-lang-en>Open Dashboard</span></a></div>
+    </div>
+  </section>
+</main>
+
+<footer id="footer"></footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
