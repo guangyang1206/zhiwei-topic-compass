@@ -16,6 +16,24 @@
       --hit:#dc2626; --hit2:#f97316;   /* 红=高（涨），保留国内金融语义，不改 */
       --cool:#378add;
     }
+    /* ---- 暗色适配：只重映射中性色，品牌绿 / 红橙命中色保持不变 ---- */
+    :root[data-theme="dark"] {
+      --bg:#0d1117; --ink:#e8ebf0; --muted:#a9b2bd; --faint:#6b7480;
+      --brand:#3fbf90; --brand2:#57cfa0;   /* 暗底下提亮绿，保证可读 */
+      --card:#161b22; --border:#26303c; --line:#222a34;
+      --ok:#3fbf90; --warn:#e0a44a;
+      --cool:#5aa0e6;
+    }
+    :root[data-theme="dark"] body {
+      background:radial-gradient(1200px 620px at 82% -12%, #10261f 0%, var(--bg) 55%);
+    }
+    :root[data-theme="dark"] .badge { color:#57cfa0; background:#12241d; border-color:#1f4a3a; }
+    :root[data-theme="dark"] h1 span { color:var(--brand2); }
+    :root[data-theme="dark"] .pill { color:#c2cbd6; background:#1b2129; border-color:#2b3644; }
+    :root[data-theme="dark"] .kw .c { background:#161b22; }
+    :root[data-theme="dark"] .step .tag { color:#8fd8bd; background:#14211c; border-color:#245040; }
+    :root[data-theme="dark"] .step .n { color:#0d1117; }
+    :root[data-theme="dark"] textarea:focus { box-shadow:0 0 0 3px rgba(63,191,144,.18); }
     * { box-sizing:border-box; margin:0; padding:0; }
     body {
       font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",Helvetica,Arial,sans-serif;
@@ -60,7 +78,8 @@
     .card .tip { font-size:12.5px; color:var(--muted); margin:6px 0 14px; line-height:1.6; }
 
     textarea { width:100%; min-height:88px; border:1px solid var(--border); border-radius:10px; padding:12px;
-      font-size:14px; font-family:inherit; color:var(--ink); resize:vertical; line-height:1.6; }
+      font-size:14px; font-family:inherit; color:var(--ink); background:var(--card); resize:vertical; line-height:1.6; }
+    textarea::placeholder { color:var(--faint); }
     textarea:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px rgba(15,110,86,.1); }
     .btn { appearance:none; border:none; cursor:pointer; font-size:14.5px; font-weight:600; color:#fff;
       background:linear-gradient(135deg,#1D9E75,#0F6E56); padding:11px 20px; border-radius:10px; margin-top:12px;
