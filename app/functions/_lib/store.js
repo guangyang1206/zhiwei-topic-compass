@@ -74,14 +74,27 @@ export function createStore(backend) {
 }
 
 /**
- * 从 EdgeOne Functions 的 env 中解析出 KV 后端。
- * 生产：env.TOPIC_KV（控制台绑定命名空间时填的变量名）。
- * 本地：dev-server 会把内存实现挂到 env.TOPIC_KV。
+ * 从 EdgeOne Functions 运行时解析出 KV 后端。
+ *
+ * 重要（踩坑记录）：EdgeOne Pages 的 KV 绑定变量名（如 TOPIC_KV）是以
+ * **全局变量**形式注入到函数作用域的（官方文档 Example 里直接裸用 my_kv），
+ * 而 **不会** 挂在 context.env 上。普通环境变量（如 SEED_TOKEN）才在 env 上。
+ * 因此这里的解析顺序：
+ *   1) context.env.TOPIC_KV —— 本地 dev-server 走这条（注入到 env）
+ *   2) globalThis.TOPIC_KV  —— 生产 EdgeOne Pages 走这条（全局注入）
+ *   3) 常见备用命名 KV
  */
 export function resolveBackend(env) {
   if (env && env.TOPIC_KV) return env.TOPIC_KV;
+  // 生产：KV 绑定作为全局变量注入
+  try {
+    if (typeof globalThis !== 'undefined' && globalThis.TOPIC_KV) return globalThis.TOPIC_KV;
+  } catch { /* ignore */ }
   // 兼容其他常见命名
   if (env && env.KV) return env.KV;
+  try {
+    if (typeof globalThis !== 'undefined' && globalThis.KV) return globalThis.KV;
+  } catch { /* ignore */ }
   return null;
 }
 
