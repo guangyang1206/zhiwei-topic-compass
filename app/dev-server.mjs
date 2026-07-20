@@ -13,7 +13,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 8788;
 
 // 本地注入的 env：把本地 KV 挂到 TOPIC_KV（与生产绑定变量名一致）
-const env = { TOPIC_KV: new LocalKV(join(__dirname, 'data', 'kv.json')) };
+// SEED_TOKEN 仅本地默认值，方便测试 /api/admin/seed；生产用控制台环境变量。
+const env = {
+  TOPIC_KV: new LocalKV(join(__dirname, 'data', 'kv.json')),
+  SEED_TOKEN: process.env.SEED_TOKEN || 'local-dev-seed',
+};
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',

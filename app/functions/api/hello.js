@@ -1,5 +1,5 @@
 // EdgeOne Pages Function —— 路由: /api/hello
-// 选题罗盘 TopicCompass · D1 骨架的"可运行"证据
+// 知微 ZhiWei · Functions "可运行"证据
 // 导出 onRequest 处理所有 HTTP 方法，返回 JSON。
 
 export function onRequest(context) {
@@ -9,9 +9,9 @@ export function onRequest(context) {
 
   const body = {
     ok: true,
-    service: 'TopicCompass 选题罗盘',
+    service: '知微 ZhiWei',
     message: `Hello, ${name}! EdgeOne Makers Functions is running.`,
-    hint: '这是数据回流 API 的骨架端点，后续在此写入选题/发布/互动数据到 Edge KV。',
+    hint: '这是数据回流 API 的骨架端点，将选题/发布/互动数据写入 Edge KV。',
     method: request.method,
     time: new Date().toISOString(),
   };

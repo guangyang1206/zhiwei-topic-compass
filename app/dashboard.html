@@ -154,22 +154,25 @@
   <header id="nav"></header>
   <div class="wrap">
     <div class="topbar">
-      <span class="badge">🧭 AI 黑客松 · 方向 B · 基于 WorkBuddy + EdgeOne Makers</span>
-      <span class="live"><span class="dot" id="liveDot"></span><span id="liveText">数据源自检中…</span></span>
+      <span class="badge"><span data-lang-zh>🧭 AI 黑客松 · 方向 B · 基于 WorkBuddy + EdgeOne Makers</span><span data-lang-en>🧭 AI Hackathon · Track B · Built on WorkBuddy + EdgeOne Makers</span></span>
+      <span class="live"><span class="dot" id="liveDot"></span><span id="liveText"></span></span>
     </div>
 
     <h1>知微 <span>ZhiWei</span></h1>
     <p class="sub">
-      别人的 AI 工具帮你「把内容写出来」，知微帮你「决定<b>写什么</b>最值得写」——
+      <span data-lang-zh>别人的 AI 工具帮你「把内容写出来」，知微帮你「决定<b>写什么</b>最值得写」——
       用你自己的历史发布数据为每个候选选题打「命中分」，一稿自动适配多平台，发布数据回流让系统越用越准。
-      <b>不是 AI 拍脑袋，是你的数据在说话。</b>
+      <b>不是 AI 拍脑袋，是你的数据在说话。</b></span>
+      <span data-lang-en>Other AI tools help you <b>write</b> the content; ZhiWei helps you decide <b>what's worth writing</b> —
+      it scores every candidate topic against your own publishing history, adapts one draft to every platform,
+      and gets sharper as engagement data flows back. <b>Not an AI guessing — your own data talking.</b></span>
     </p>
     <div class="pills">
-      <span class="pill">🧭 选题评分官 Expert</span>
-      <span class="pill">📡 选题雷达 Skill</span>
-      <span class="pill">✍️ 多平台改写 Skill</span>
-      <span class="pill">📈 命中率复盘 Skill</span>
-      <span class="pill">⏰ 定时闭环 Automation</span>
+      <span class="pill"><span data-lang-zh>🧭 选题评分官 Expert</span><span data-lang-en>🧭 Topic Scorer · Expert</span></span>
+      <span class="pill"><span data-lang-zh>📡 选题雷达 Skill</span><span data-lang-en>📡 Topic Radar · Skill</span></span>
+      <span class="pill"><span data-lang-zh>✍️ 多平台改写 Skill</span><span data-lang-en>✍️ Multi-platform Rewrite · Skill</span></span>
+      <span class="pill"><span data-lang-zh>📈 命中率复盘 Skill</span><span data-lang-en>📈 Hit-rate Review · Skill</span></span>
+      <span class="pill"><span data-lang-zh>⏰ 定时闭环 Automation</span><span data-lang-en>⏰ Scheduled Loop · Automation</span></span>
     </div>
 
     <!-- KPI 条 -->
@@ -178,42 +181,42 @@
     <!-- 主区：评分 + 时段热力 -->
     <div class="grid two">
       <div class="card">
-        <h2>🎯 选题命中分 · 现场评分</h2>
-        <p class="tip">输入你在犹豫的候选选题（每行一个），系统基于历史发布数据实时打分并给出<b>可解释</b>的理由。这就是「数据驱动选题」的核心。</p>
+        <h2><span data-lang-zh>🎯 选题命中分 · 现场评分</span><span data-lang-en>🎯 Topic Hit Score · Live Scoring</span></h2>
+        <p class="tip"><span data-lang-zh>输入你在犹豫的候选选题（每行一个），系统基于历史发布数据实时打分并给出<b>可解释</b>的理由。这就是「数据驱动选题」的核心。</span><span data-lang-en>Enter the candidate topics you're unsure about (one per line). ZhiWei scores each against your publishing history in real time, with <b>explainable</b> reasons — the core of data-driven topic selection.</span></p>
         <textarea id="cands">AI工具实操：5个提示词技巧
 深夜随笔：聊聊最近的心情
 爆款标题的6个套路拆解</textarea>
-        <button class="btn" id="scoreBtn">给这些选题打分 →</button>
-        <div class="status" id="scoreStatus">状态：待评分</div>
+        <button class="btn" id="scoreBtn"><span data-lang-zh>给这些选题打分 →</span><span data-lang-en>Score these topics →</span></button>
+        <div class="status" id="scoreStatus"></div>
         <div id="scoreOut"></div>
       </div>
 
       <div class="card">
-        <h2>🕐 发布时段命中热力</h2>
-        <p class="tip">相同的选题，什么时段发更容易爆？这是系统从历史数据里学出的时段规律。</p>
-        <div id="timeOut"><div class="status">加载中…</div></div>
-        <h2 style="margin-top:18px;">🏷️ 高命中关键词（按置信度）</h2>
-        <p class="tip">命中率 × 样本量加权，避免「只爆过一次」的偶然词误导选题。</p>
-        <div id="kwOut" class="kw"><div class="status">加载中…</div></div>
+        <h2><span data-lang-zh>🕐 发布时段命中热力</span><span data-lang-en>🕐 Publish-time Hit Heatmap</span></h2>
+        <p class="tip"><span data-lang-zh>相同的选题，什么时段发更容易爆？这是系统从历史数据里学出的时段规律。</span><span data-lang-en>Same topic, which time slot performs best? A time-of-day pattern learned from your history.</span></p>
+        <div id="timeOut"></div>
+        <h2 style="margin-top:18px;"><span data-lang-zh>🏷️ 高命中关键词（按置信度）</span><span data-lang-en>🏷️ High-hit Keywords (by confidence)</span></h2>
+        <p class="tip"><span data-lang-zh>命中率 × 样本量加权，避免「只爆过一次」的偶然词误导选题。</span><span data-lang-en>Weighted by hit-rate × sample size, so a keyword that popped once by luck won't mislead you.</span></p>
+        <div id="kwOut" class="kw"></div>
       </div>
     </div>
 
     <!-- 选题排名 -->
     <div class="grid">
       <div class="card">
-        <h2>📊 历史选题命中率排名</h2>
-        <p class="tip">哪些选题方向值得持续投入、哪些该做减法，一目了然。</p>
-        <div id="topicOut"><div class="status">加载中…</div></div>
+        <h2><span data-lang-zh>📊 历史选题命中率排名</span><span data-lang-en>📊 Topic Hit-rate Ranking</span></h2>
+        <p class="tip"><span data-lang-zh>哪些选题方向值得持续投入、哪些该做减法，一目了然。</span><span data-lang-en>See at a glance which topic directions deserve more investment and which to cut.</span></p>
+        <div id="topicOut"></div>
       </div>
     </div>
 
     <!-- 闭环流程 -->
-    <div class="sec-title">数据驱动闭环 · WorkBuddy 可复用资产贯穿始终</div>
+    <div class="sec-title"><span data-lang-zh>数据驱动闭环 · WorkBuddy 可复用资产贯穿始终</span><span data-lang-en>Data-driven loop · Reusable WorkBuddy assets throughout</span></div>
     <div class="flow" id="flow"></div>
 
     <p class="foot">
-      部署于 EdgeOne Makers · 全球边缘 · Serverless Functions + Edge KV · 内置模型 50 万 token/月<br/>
-      © 知微 ZhiWei　|　<span id="apiEnv">环境自检中…</span>
+      <span data-lang-zh>部署于 EdgeOne Makers · 全球边缘 · Serverless Functions + Edge KV · 内置模型 50 万 token/月</span><span data-lang-en>Deployed on EdgeOne Makers · Global edge · Serverless Functions + Edge KV · 500k built-in model tokens/mo</span><br/>
+      © 知微 ZhiWei　|　<span id="apiEnv"></span>
     </p>
   </div>
 
@@ -221,7 +224,13 @@
   const $ = (id) => document.getElementById(id);
   const pct = (x) => Math.round(x*100) + '%';
   const esc = (s) => String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  // 当前语言（跟随 <html data-lang>，与全站一致）
+  const LANG = () => (document.documentElement.getAttribute('data-lang') === 'en' ? 'en' : 'zh');
+  // 双语片段：输出两个 span，由全站 CSS [data-lang-*] 控制显隐，切换语言零重渲染
+  const L = (zh, en) => '<span data-lang-zh>'+zh+'</span><span data-lang-en>'+en+'</span>';
   const timeZh = { dawn:'凌晨', morning:'上午', noon:'午间', afternoon:'下午', evening:'晚间', night:'深夜', unknown:'未知' };
+  const timeEn = { dawn:'Dawn', morning:'Morning', noon:'Noon', afternoon:'Afternoon', evening:'Evening', night:'Late night', unknown:'Unknown' };
+  const timeName = (k) => L(timeZh[k]||k, timeEn[k]||k);
 
   /* ================= 本地真实数据快照（本地 dev 已验证，31 篇种子数据）=================
      用途：EdgeOne 证书未就绪 / KV 未绑定 / 纯静态预览时，页面依然完整、真实、可演示。
@@ -244,10 +253,10 @@
     // KPI
     const bestTime = data.byTime.slice().sort((a,b)=>b.hitRate-a.hitRate)[0];
     const kpi = [
-      { k:'历史样本', v:data.total, s:'篇', h:'纳入规律学习' },
-      { k:'整体命中率', v:pct(data.hitRate), h:'爆款 '+data.hits+' 篇 · 阈值 P70', accent:true },
-      { k:'最佳发布时段', v: bestTime?timeZh[bestTime.key]:'—', s: bestTime?('  '+pct(bestTime.hitRate)):'', h:'时段规律差异显著' },
-      { k:'已建规律维度', v:'3', s:'类', h:'关键词 / 时段 / 标题' },
+      { k:L('历史样本','History'), v:data.total, s:L('篇','posts'), h:L('纳入规律学习','used for learning') },
+      { k:L('整体命中率','Overall hit-rate'), v:pct(data.hitRate), h:L('爆款 '+data.hits+' 篇 · 阈值 P70','Hits '+data.hits+' · P70 threshold'), accent:true },
+      { k:L('最佳发布时段','Best time slot'), v: bestTime?timeName(bestTime.key):'—', s: bestTime?('  '+pct(bestTime.hitRate)):'', h:L('时段规律差异显著','Strong time-of-day effect') },
+      { k:L('已建规律维度','Pattern dimensions'), v:'3', s:L('类','types'), h:L('关键词 / 时段 / 标题','Keyword / Time / Title') },
     ];
     $('kpis').innerHTML = kpi.map(x =>
       '<div class="kpi'+(x.accent?' accent':'')+'"><div class="k">'+x.k+'</div>'
@@ -261,7 +270,7 @@
     $('timeOut').innerHTML = tsorted.map(t=>{
       const w = Math.round(t.hitRate/tmax*100);
       const z = t.hitRate===0;
-      return '<div class="row"><span class="lab">'+timeZh[t.key]+'</span>'
+      return '<div class="row"><span class="lab">'+timeName(t.key)+'</span>'
         +'<span class="track'+(z?' cool':'')+'"><i style="width:'+(z?3:w)+'%"></i></span>'
         +'<span class="val'+(z?' z':'')+'">'+pct(t.hitRate)+'<span class="n" style="color:var(--faint);font-weight:600;font-size:11px;"> n='+t.count+'</span></span></div>';
     }).join('');
@@ -276,20 +285,20 @@
     // 选题排名表
     const rows = data.byTopic.slice(0,8).map(t=>{
       const cls = t.hitRate>=0.5?'hi':t.hitRate>=0.25?'mid':'lo';
-      return '<tr><td>'+esc(t.topic)+'</td><td>'+t.count+' 篇</td>'
+      return '<tr><td>'+esc(t.topic)+'</td><td>'+t.count+L(' 篇',' posts')+'</td>'
         +'<td class="hr '+cls+'">'+pct(t.hitRate)
         +'<span class="mini-bar"><i style="width:'+Math.round(t.hitRate*100)+'%"></i></span></td></tr>';
     }).join('');
-    $('topicOut').innerHTML = '<table class="tbl"><thead><tr><th>选题方向</th><th>样本</th><th>命中率</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    $('topicOut').innerHTML = '<table class="tbl"><thead><tr><th>'+L('选题方向','Topic direction')+'</th><th>'+L('样本','Sample')+'</th><th>'+L('命中率','Hit-rate')+'</th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
 
   /* ---------------- 闭环流程条 ---------------- */
   const STEPS = [
-    { n:1, t:'选题雷达', d:'抓热点 + 领域关键词，产候选选题清单', tag:'Skill' },
-    { n:2, t:'选题评分官', d:'基于历史规律为候选打命中分 + 可解释理由', tag:'Expert' },
-    { n:3, t:'多平台改写', d:'一稿适配公众号 / 视频号 / 小红书 / 知乎', tag:'Skill' },
-    { n:4, t:'数据回流', d:'发布后互动数据写入 Edge KV', tag:'Functions' },
-    { n:5, t:'命中率复盘', d:'提炼有效模式，反哺下一轮选题', tag:'Automation' },
+    { n:1, t:L('选题雷达','Topic Radar'), d:L('抓热点 + 领域关键词，产候选选题清单','Fetch trends + niche keywords → candidate list'), tag:'Skill' },
+    { n:2, t:L('选题评分官','Topic Scorer'), d:L('基于历史规律为候选打命中分 + 可解释理由','Score candidates on historical patterns, with reasons'), tag:'Expert' },
+    { n:3, t:L('多平台改写','Multi-platform Rewrite'), d:L('一稿适配公众号 / 视频号 / 小红书 / 知乎','One draft → WeChat / Channels / RED / Zhihu'), tag:'Skill' },
+    { n:4, t:L('数据回流','Data Feedback'), d:L('发布后互动数据写入 Edge KV','Post-publish engagement written to Edge KV'), tag:'Functions' },
+    { n:5, t:L('命中率复盘','Hit-rate Review'), d:L('提炼有效模式，反哺下一轮选题','Distill winning patterns to feed the next round'), tag:'Automation' },
   ];
   $('flow').innerHTML = STEPS.map((s,i)=>
     '<div class="step"><span class="n">'+s.n+'</span><h3>'+s.t+'</h3><p>'+s.d+'</p><span class="tag">'+s.tag+'</span></div>'
@@ -304,16 +313,16 @@
       const j = await res.json();
       const d = { ...j.summary, byTopic: j.byTopic };
       render(d);
-      setLive(true, '实时数据 · EdgeOne KV');
+      setLive(true, L('实时数据 · EdgeOne KV','Live data · EdgeOne KV'));
     } catch {
       render(SNAPSHOT);
-      setLive(false, '演示快照 · 本地已验证 31 篇');
+      setLive(false, L('演示快照 · 本地已验证 31 篇','Demo snapshot · 31 posts verified'));
     }
   })();
 
   function setLive(on, text){
     $('liveDot').className = 'dot' + (on?' on':'');
-    $('liveText').textContent = text;
+    $('liveText').innerHTML = text;
   }
 
   /* ---------------- 环境自检 ---------------- */
@@ -321,36 +330,45 @@
     try {
       const res = await fetch('/api/hello?name='+encodeURIComponent('黑客松评审'), { cache:'no-store' });
       const ct = res.headers.get('content-type')||'';
-      if (res.ok && ct.includes('application/json')) { $('apiEnv').textContent = 'Serverless 环境正常 · /api/hello 已响应'; return; }
+      if (res.ok && ct.includes('application/json')) { $('apiEnv').innerHTML = L('Serverless 环境正常 · /api/hello 已响应','Serverless OK · /api/hello responded'); return; }
       throw 0;
-    } catch { $('apiEnv').textContent = '静态预览环境（部署到 EdgeOne 并绑定 KV 后 API 实时生效）'; }
+    } catch { $('apiEnv').innerHTML = L('静态预览环境（部署到 EdgeOne 并绑定 KV 后 API 实时生效）','Static preview (APIs go live once deployed to EdgeOne with KV bound)'); }
   })();
 
   /* ================= 现场评分：API 优先，失败用内嵌引擎兜底 ================= */
   $('scoreBtn').addEventListener('click', async () => {
     const lines = $('cands').value.split('\n').map(x=>x.trim()).filter(Boolean);
-    if (!lines.length) { $('scoreStatus').textContent = '状态：请至少输入一个选题'; return; }
+    if (!lines.length) { $('scoreStatus').innerHTML = L('状态：请至少输入一个选题','Status: enter at least one topic'); return; }
     const candidates = lines.map(topic => ({ topic, plannedTime: defaultEveningToday(), plannedTitle: topic }));
-    $('scoreBtn').disabled = true; $('scoreStatus').textContent = '状态：评分中…'; $('scoreOut').innerHTML = '';
+    $('scoreBtn').disabled = true; $('scoreStatus').innerHTML = L('状态：评分中…','Status: scoring…'); $('scoreOut').innerHTML = '';
     try {
       const res = await fetch('/api/score', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ candidates }) });
       if (!res.ok) throw new Error('HTTP '+res.status);
       const j = await res.json();
-      $('scoreStatus').innerHTML = '状态：<b>完成</b> · 实时接口 · 基于 '+j.basedOn.posts+' 篇历史（命中率 '+pct(j.basedOn.hitRate)+'）';
+      $('scoreStatus').innerHTML = L('状态：<b>完成</b> · 实时接口 · 基于 '+j.basedOn.posts+' 篇历史（命中率 '+pct(j.basedOn.hitRate)+'）',
+                                     'Status: <b>done</b> · live API · based on '+j.basedOn.posts+' posts (hit-rate '+pct(j.basedOn.hitRate)+')');
       $('scoreOut').innerHTML = j.scores.map(renderScore).join('');
     } catch {
       // 内嵌评分引擎（与后端 analytics.js 同逻辑的浏览器版），保证任何环境都能演示
       const scores = localScore(candidates, SNAPSHOT);
-      $('scoreStatus').innerHTML = '状态：<b>完成</b>（演示引擎）· 基于 '+SNAPSHOT.total+' 篇历史（命中率 '+pct(SNAPSHOT.hitRate)+'）';
+      $('scoreStatus').innerHTML = L('状态：<b>完成</b>（演示引擎）· 基于 '+SNAPSHOT.total+' 篇历史（命中率 '+pct(SNAPSHOT.hitRate)+'）',
+                                     'Status: <b>done</b> (demo engine) · based on '+SNAPSHOT.total+' posts (hit-rate '+pct(SNAPSHOT.hitRate)+')');
       $('scoreOut').innerHTML = scores.map(renderScore).join('');
     } finally { $('scoreBtn').disabled = false; }
   });
 
+  // 判定等级：value 作 CSS class（保持中文键），显示用双语
+  const LEVEL_EN = { '强推':'Strong', '可做':'Worth it', '谨慎':'Caution', '不建议':'Skip' };
   function renderScore(s){
-    const reasons = (s.reasons||[]).map(r=>'<li>'+esc(r)+'</li>').join('');
+    // reasons 可能是字符串数组(旧)或 {zh,en} 对象数组(本地引擎新版)
+    const reasons = (s.reasons||[]).map(r=>{
+      if (r && typeof r === 'object') return '<li>'+L(esc(r.zh), esc(r.en))+'</li>';
+      return '<li>'+esc(r)+'</li>';
+    }).join('');
+    const lvLabel = L(s.level, LEVEL_EN[s.level] || s.level);
     return '<div class="score-item"><div class="score-head">'
       +'<div class="score-num lv-'+s.level+'">'+s.score+'</div>'
-      +'<div><div class="score-topic">'+esc(s.topic)+'</div><div class="score-level">判定：'+s.level+'</div></div></div>'
+      +'<div><div class="score-topic">'+esc(s.topic)+'</div><div class="score-level">'+L('判定：','Verdict: ')+lvLabel+'</div></div></div>'
       +'<ul class="reasons">'+reasons+'</ul></div>';
   }
   function defaultEveningToday(){ const d=new Date(); d.setHours(20,30,0,0); return d.toISOString(); }
@@ -367,15 +385,15 @@
       const reasons=[]; let score=40;
       const kws = (c.keywords&&c.keywords.length)?c.keywords:autoKw(c.topic);
       let boost=0, matched=[];
-      for(const kw of kws){ const st=kwMap.get(kw); if(st&&st.hitRate>baseline){ boost+=Math.round((st.hitRate-baseline)*60); matched.push(kw+'(命中率'+pct(st.hitRate)+')'); } }
-      if(boost){ score+=Math.min(30,boost); reasons.push('选题关键词踩中历史高命中主题：'+matched.join('、')); }
-      else reasons.push('选题关键词与历史高命中主题重合度低，命中不确定性较高');
+      for(const kw of kws){ const st=kwMap.get(kw); if(st&&st.hitRate>baseline){ boost+=Math.round((st.hitRate-baseline)*60); matched.push(kw+'('+pct(st.hitRate)+')'); } }
+      if(boost){ score+=Math.min(30,boost); reasons.push({zh:'选题关键词踩中历史高命中主题：'+matched.join('、'), en:'Keywords match high-hit historical topics: '+matched.join(', ')}); }
+      else reasons.push({zh:'选题关键词与历史高命中主题重合度低，命中不确定性较高', en:'Low overlap with high-hit historical topics — hit uncertainty is higher'});
       const b = c.plannedTime?tb(c.plannedTime):null;
-      if(b){ const st=timeMap.get(b); if(st&&st.hitRate>baseline){ score+=10; reasons.push('计划发布时段「'+timeZh[b]+'」历史命中率 '+pct(st.hitRate)+'，优于平均'); } else if(st){ score-=5; reasons.push('计划发布时段「'+timeZh[b]+'」历史表现偏弱，建议换时段'); } }
+      if(b){ const st=timeMap.get(b); if(st&&st.hitRate>baseline){ score+=10; reasons.push({zh:'计划发布时段「'+timeZh[b]+'」历史命中率 '+pct(st.hitRate)+'，优于平均', en:'Planned slot "'+timeEn[b]+'" hit-rate '+pct(st.hitRate)+', above average'}); } else if(st){ score-=5; reasons.push({zh:'计划发布时段「'+timeZh[b]+'」历史表现偏弱，建议换时段', en:'Planned slot "'+timeEn[b]+'" underperforms historically — consider another slot'}); } }
       if(c.plannedTitle){ const f=titleFeat(c.plannedTitle); const tf=model.byTitle||{};
-        if(f.hasPain&&tf.hasPain&&tf.hasPain.hitRate>baseline){ score+=8; reasons.push('标题含痛点/情绪词，历史此类标题命中率更高'); }
-        if(f.hasNumber&&tf.hasNumber&&tf.hasNumber.hitRate>baseline){ score+=5; reasons.push('标题含数字，历史此类标题更易命中'); }
-        if(f.len>30){ score-=4; reasons.push('标题偏长（>30 字），建议精简'); }
+        if(f.hasPain&&tf.hasPain&&tf.hasPain.hitRate>baseline){ score+=8; reasons.push({zh:'标题含痛点/情绪词，历史此类标题命中率更高', en:'Title has pain/emotion words — such titles hit more often'}); }
+        if(f.hasNumber&&tf.hasNumber&&tf.hasNumber.hitRate>baseline){ score+=5; reasons.push({zh:'标题含数字，历史此类标题更易命中', en:'Title has numbers — such titles tend to hit'}); }
+        if(f.len>30){ score-=4; reasons.push({zh:'标题偏长（>30 字），建议精简', en:'Title is long (>30 chars) — consider trimming'}); }
       }
       score=Math.max(0,Math.min(100,Math.round(score)));
       return { topic:c.topic, score, level: score>=75?'强推':score>=60?'可做':score>=45?'谨慎':'不建议', reasons };
