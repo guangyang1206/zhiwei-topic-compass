@@ -94,6 +94,72 @@ export const OPENAPI_SPEC = {
           },
         },
       },
+      post: {
+        tags: ['内容'],
+        summary: '新增内容',
+        description: '录入一篇已发布内容及其互动数据。系统自动生成 id、计算互动分（engagement）并纳入统计与评分。',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/PostInput' },
+              example: {
+                topic: 'AI 副业', title: '4个AI副业方向，我靠第2个月入过万', platform: 'wechat',
+                keywords: 'AI, 副业, 变现', publishedAt: '2026-07-21T20:30:00+08:00',
+                read: 12000, like: 800, comment: 120, share: 60, followGain: 45,
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: '新增成功',
+            content: { 'application/json': { schema: { type: 'object', properties: { ok: { type: 'boolean' }, post: { $ref: '#/components/schemas/Post' } } } } },
+          },
+          400: { description: '缺少必填字段', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          503: { description: 'KV 未绑定', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      put: {
+        tags: ['内容'],
+        summary: '编辑内容',
+        description: '按 id 更新一篇内容。保留 createdAt，刷新 updatedAt 并重算互动分。',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { allOf: [{ $ref: '#/components/schemas/PostInput' }, { required: ['id'] }] },
+              example: { id: '1784701045606_x5zwe', topic: 'AI 副业', title: '修改后的标题', read: 99999 },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: '更新成功',
+            content: { 'application/json': { schema: { type: 'object', properties: { ok: { type: 'boolean' }, post: { $ref: '#/components/schemas/Post' } } } } },
+          },
+          400: { description: '缺少 id 或必填字段', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          404: { description: '内容不存在', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
+      delete: {
+        tags: ['内容'],
+        summary: '删除内容',
+        description: '按 id 删除一篇内容。id 可放 body 或 query（?id=）。',
+        parameters: [{ name: 'id', in: 'query', required: false, schema: { type: 'string' }, description: '内容 id（也可放在请求体）' }],
+        requestBody: {
+          required: false,
+          content: { 'application/json': { schema: { type: 'object', properties: { id: { type: 'string' } } }, example: { id: '1784701045606_x5zwe' } } },
+        },
+        responses: {
+          200: {
+            description: '删除成功',
+            content: { 'application/json': { schema: { type: 'object', properties: { ok: { type: 'boolean' }, deleted: { type: 'string' } } } } },
+          },
+          400: { description: '缺少 id', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+          404: { description: '内容不存在', content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } } },
+        },
+      },
     },
     '/api/score': {
       post: {
@@ -269,6 +335,31 @@ export const OPENAPI_SPEC = {
           comment: { type: 'integer' },
           share: { type: 'integer' },
           followGain: { type: 'integer' },
+          engagement: { type: 'integer', description: '综合互动分（系统计算）' },
+          createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
+      },
+      PostInput: {
+        type: 'object',
+        required: ['topic', 'title'],
+        properties: {
+          id: { type: 'string', description: '编辑时必填；新增时留空由系统生成' },
+          topic: { type: 'string', description: '选题方向' },
+          title: { type: 'string', description: '标题' },
+          platform: { type: 'string', default: 'wechat' },
+          publishedAt: { type: 'string', format: 'date-time' },
+          keywords: {
+            oneOf: [{ type: 'array', items: { type: 'string' } }, { type: 'string' }],
+            description: '数组，或逗号/顿号/空格分隔的字符串',
+          },
+          summary: { type: 'string' },
+          read: { type: 'integer' },
+          like: { type: 'integer' },
+          looking: { type: 'integer' },
+          comment: { type: 'integer' },
+          share: { type: 'integer' },
+          followGain: { type: 'integer' },
         },
       },
       Candidate: {
@@ -292,10 +383,22 @@ export const OPENAPI_SPEC = {
         type: 'object',
         properties: {
           topic: { type: 'string' },
+          title: { type: 'string', description: '拟定标题（回显）' },
           score: { type: 'integer', example: 72 },
           level: { type: 'string', enum: ['强推', '可做', '谨慎', '不建议'] },
           keywords: { type: 'array', items: { type: 'string' } },
-          reasons: { type: 'array', items: { type: 'string' } },
+          reasons: { type: 'array', items: { type: 'string' }, description: '可解释的评分依据（文本）' },
+          breakdown: {
+            type: 'object',
+            description: '评分构成：基线 + 各维度贡献（可为负）',
+            properties: {
+              base: { type: 'integer', example: 40 },
+              keyword: { type: 'integer', example: 20 },
+              time: { type: 'integer', example: 10 },
+              title: { type: 'integer', example: 5 },
+            },
+          },
+          suggestions: { type: 'array', items: { type: 'string' }, description: '可操作的发布建议' },
         },
       },
       ScoreResponse: {

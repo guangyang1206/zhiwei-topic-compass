@@ -154,7 +154,15 @@ export function scoreCandidates(candidates, model) {
 
   return candidates.map(c => {
     const reasons = [];
-    let score = 40; // 基线分
+    const BASE = 40;
+    let score = BASE; // 基线分
+    // 结构化维度贡献（供前端可视化「评分构成」）
+    const breakdown = {
+      base: BASE,
+      keyword: 0,
+      time: 0,
+      title: 0,
+    };
 
     // 1) 关键词匹配历史高命中词 —— 用置信下界(confidence)而非裸命中率，避免小样本虚高
     const kws = c.keywords && c.keywords.length ? c.keywords : autoKeywords(c.topic);
@@ -173,7 +181,11 @@ export function scoreCandidates(candidates, model) {
         weakMatched.push(`${kw}(命中率${pct(stat.hitRate)}但仅n=${stat.count}，样本不足待验证)`);
       }
     }
-    if (kwBoost) { score += Math.min(30, kwBoost); reasons.push(`选题关键词踩中历史高命中主题（已按样本量做置信度加权）：${matched.join('、')}`); }
+    if (kwBoost) {
+      const applied = Math.min(30, kwBoost);
+      score += applied; breakdown.keyword += applied;
+      reasons.push(`选题关键词踩中历史高命中主题（已按样本量做置信度加权）：${matched.join('、')}`);
+    }
     if (weakMatched.length) reasons.push(`潜力信号（样本不足，未计入高分）：${weakMatched.join('、')}`);
     if (!kwBoost && !weakMatched.length) reasons.push('选题关键词与历史高命中主题重合度低，命中不确定性较高');
 
@@ -183,9 +195,9 @@ export function scoreCandidates(candidates, model) {
       const stat = timeMap.get(tb);
       const tConf = stat ? (stat.confidence != null ? stat.confidence : stat.hitRate) : null;
       if (stat && tConf > baseline) {
-        score += 10; reasons.push(`计划发布时段「${zhTime(tb)}」历史命中率 ${pct(stat.hitRate)}（n=${stat.count}），优于平均`);
+        score += 10; breakdown.time += 10; reasons.push(`计划发布时段「${zhTime(tb)}」历史命中率 ${pct(stat.hitRate)}（n=${stat.count}），优于平均`);
       } else if (stat) {
-        score -= 5; reasons.push(`计划发布时段「${zhTime(tb)}」历史表现偏弱（命中率${pct(stat.hitRate)}，n=${stat.count}），建议换时段`);
+        score -= 5; breakdown.time -= 5; reasons.push(`计划发布时段「${zhTime(tb)}」历史表现偏弱（命中率${pct(stat.hitRate)}，n=${stat.count}），建议换时段`);
       }
     }
 
@@ -193,22 +205,52 @@ export function scoreCandidates(candidates, model) {
     if (c.plannedTitle) {
       const f = titleFeatures(c.plannedTitle);
       const tf = model.byTitle || {};
-      if (f.hasPain && tf.hasPain && tf.hasPain.hitRate > baseline) { score += 8; reasons.push(`标题含痛点/情绪词，历史此类标题命中率更高（${pct(tf.hasPain.hitRate)}）`); }
-      if (f.hasNumber && tf.hasNumber && tf.hasNumber.hitRate > baseline) { score += 5; reasons.push(`标题含数字，历史此类标题更易命中（${pct(tf.hasNumber.hitRate)}）`); }
-      if (f.len > 30) { score -= 4; reasons.push('标题偏长（>30 字），建议精简'); }
+      if (f.hasPain && tf.hasPain && tf.hasPain.hitRate > baseline) { score += 8; breakdown.title += 8; reasons.push(`标题含痛点/情绪词，历史此类标题命中率更高（${pct(tf.hasPain.hitRate)}）`); }
+      if (f.hasNumber && tf.hasNumber && tf.hasNumber.hitRate > baseline) { score += 5; breakdown.title += 5; reasons.push(`标题含数字，历史此类标题更易命中（${pct(tf.hasNumber.hitRate)}）`); }
+      if (f.len > 30) { score -= 4; breakdown.title -= 4; reasons.push('标题偏长（>30 字），建议精简'); }
     } else {
       reasons.push('未提供拟定标题，建议补充以获得标题维度评分');
     }
 
     score = Math.max(0, Math.min(100, Math.round(score)));
+    const level = score >= 75 ? '强推' : score >= 60 ? '可做' : score >= 45 ? '谨慎' : '不建议';
     return {
       topic: c.topic,
+      title: c.plannedTitle || '',
       score,
-      level: score >= 75 ? '强推' : score >= 60 ? '可做' : score >= 45 ? '谨慎' : '不建议',
+      level,
       keywords: kws,
       reasons,
+      breakdown,
+      suggestions: buildSuggestions({ score, breakdown, matched, weakMatched, tb, hasTitle: !!c.plannedTitle, model, baseline }),
     };
   }).sort((a, b) => b.score - a.score);
+}
+
+// 依据评分构成生成「发布建议」（可操作的下一步）
+function buildSuggestions({ score, breakdown, weakMatched, tb, hasTitle, model, baseline }) {
+  const tips = [];
+  // 时段建议：给出历史最佳时段
+  const bestTime = (model.byTime || []).slice().sort((a, b) => (b.confidence ?? b.hitRate) - (a.confidence ?? a.hitRate))[0];
+  if (breakdown.time <= 0 && bestTime) {
+    tips.push(`把发布时间安排到「${zhTime(bestTime.key)}」，历史命中率 ${pct(bestTime.hitRate)}（n=${bestTime.count}）最高`);
+  }
+  // 标题建议
+  if (!hasTitle) {
+    tips.push('补充拟定标题，并尝试加入具体数字或痛点/情绪词，可提升标题维度得分');
+  } else if (breakdown.title <= 0) {
+    tips.push('标题可尝试加入具体数字（如「3 个」「月入过万」）或痛点词，历史数据显示此类标题命中更高');
+  }
+  // 关键词建议：推荐 Top 高命中词
+  if (breakdown.keyword <= 0) {
+    const top = (model.topKeywords || []).filter(k => (k.confidence ?? k.hitRate) > baseline).slice(0, 3).map(k => k.key);
+    if (top.length) tips.push(`选题可向历史高命中关键词靠拢：${top.join('、')}`);
+  }
+  if (weakMatched && weakMatched.length) {
+    tips.push('部分关键词命中率高但样本不足，属潜力方向，可小步测试验证');
+  }
+  if (!tips.length) tips.push('各维度均达标，可按计划发布');
+  return tips;
 }
 
 function autoKeywords(topic = '') {
