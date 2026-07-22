@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+# pre-push 敏感信息扫描钩子
+# ------------------------------------------------------------
+# 目的：在 push 到远程（尤其是公开的 GitHub 仓库）之前，
+#       扫描本次将要推送的提交差异，拦截疑似密钥/令牌/私钥等敏感信息。
+#
+# 启用方式（仓库根目录执行一次）：
+#   git config core.hooksPath .githooks
+#   chmod +x .githooks/*
+#
+# 绕过（仅限确认误报时）：
+#   git push --no-verify
+# ------------------------------------------------------------
+
+set -euo pipefail
+
+RED=$'\033[31m'; YELLOW=$'\033[33m'; GREEN=$'\033[32m'; DIM=$'\033[2m'; RESET=$'\033[0m'
+remote_name="${1:-origin}"
+z_local="0000000000000000000000000000000000000000"
+
+# ------------------------------------------------------------
+# 敏感信息正则规则（名称 | 正则）
+# 说明：尽量精确以降低误报；如需新增规则，按同样格式追加即可。
+# ------------------------------------------------------------
+patterns=(
+  "GitHub 细粒度 PAT|github_pat_[A-Za-z0-9_]{20,}"
+  "GitHub 经典 Token|gh[pousr]_[A-Za-z0-9]{30,}"
+  "OpenAI 密钥|sk-[A-Za-z0-9]{20,}"
+  "腾讯云 SecretId|AKID[A-Za-z0-9]{13,}"
+  "AWS Access Key|AKIA[0-9A-Z]{16}"
+  "Google API Key|AIza[0-9A-Za-z_\\-]{35}"
+  "Slack Token|xox[baprs]-[0-9A-Za-z\\-]{10,}"
+  "私钥文件头|-----BEGIN (RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----"
+  "通用密钥赋值|(secret|password|passwd|api[_-]?key|access[_-]?token|auth[_-]?token|private[_-]?key)[\"'\`]?[[:space:]]*[:=][[:space:]]*[\"'\`][A-Za-z0-9/+_\\-]{16,}[\"'\`]"
+)
+
+# 允许的占位/示例白名单（这些命中视为安全，不拦截）
+allow_regex='(YOUR_|<|xxx|XXX|example|EXAMPLE|placeholder|PLACEHOLDER|changeme|dummy|test[_-]?token|\*\*\*|\.\.\.)'
+
+echo "${DIM}[pre-push] 扫描待推送提交中的敏感信息…${RESET}"
+
+found=0
+report=""
+
+# stdin 逐行：<local_ref> <local_sha> <remote_ref> <remote_sha>
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # 删除分支（local_sha 全 0）跳过
+  [ "$local_sha" = "$z_local" ] && continue
+
+  if [ "$remote_sha" = "$z_local" ]; then
+    # 远程无此分支：扫描本地新提交（排除远程已有的一切）
+    range_args=("$local_sha" "--not" "--remotes=$remote_name")
+  else
+    # 已有远程分支：只扫本次新增的提交范围
+    range_args=("$remote_sha..$local_sha")
+  fi
+
+  # 收集本次要推送的提交列表
+  commits=$(git rev-list "${range_args[@]}" 2>/dev/null || true)
+  [ -z "$commits" ] && continue
+
+  for sha in $commits; do
+    # 只看该提交新增(+)的行，避免历史噪声
+    diff_added=$(git show --no-color --format="" --unified=0 "$sha" 2>/dev/null \
+      | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+    [ -z "$diff_added" ] && continue
+
+    for rule in "${patterns[@]}"; do
+      name="${rule%%|*}"
+      regex="${rule#*|}"
+      # 命中且不在白名单里（用 -e 终止选项解析，避免以 - 开头的正则被当成 grep 选项）
+      hits=$(printf '%s\n' "$diff_added" | grep -nE -e "$regex" | grep -vE -e "$allow_regex" || true)
+      if [ -n "$hits" ]; then
+        found=1
+        short=$(git rev-parse --short "$sha")
+        report+="${RED}✗ [${name}]${RESET} 提交 ${YELLOW}${short}${RESET}\n"
+        # 打码展示命中片段（保留首尾，中间星号），最多 3 行
+        masked=$(printf '%s\n' "$hits" | head -3 | sed -E 's/([A-Za-z0-9_]{4})[A-Za-z0-9/+_\-]{6,}([A-Za-z0-9]{2})/\1****\2/g')
+        report+="${DIM}${masked}${RESET}\n"
+      fi
+    done
+  done
+done
+
+if [ "$found" -eq 1 ]; then
+  echo ""
+  echo "${RED}════════════════════════════════════════════════════════${RESET}"
+  echo "${RED}  🚫 推送被拦截：检测到疑似敏感信息${RESET}"
+  echo "${RED}════════════════════════════════════════════════════════${RESET}"
+  printf "%b" "$report"
+  echo ""
+  echo "${YELLOW}请处理后再推送：${RESET}"
+  echo "  1. 从代码中移除密钥，改用环境变量 / 密钥管理"
+  echo "  2. 若已提交，需用 git filter-repo / rebase 清除历史"
+  echo "  3. 立即到对应平台吊销并轮换泄露的凭证"
+  echo ""
+  echo "${DIM}确认为误报时可临时绕过： git push --no-verify${RESET}"
+  echo ""
+  exit 1
+fi
+
+echo "${GREEN}[pre-push] ✓ 未发现敏感信息，允许推送。${RESET}"
+exit 0
