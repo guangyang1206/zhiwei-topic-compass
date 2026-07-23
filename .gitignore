@@ -18,6 +18,7 @@ app/data/kv.json
 
 # WorkBuddy private working logs (keep local, never publish)
 .workbuddy/memory/
+app/.workbuddy/
 
 # OS
 .DS_Store

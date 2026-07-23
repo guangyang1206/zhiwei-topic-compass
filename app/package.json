@@ -12,5 +12,8 @@
     "dev:web": "npm run dev --workspace web",
     "build": "npm install --workspace web && npm run build --workspace web && node scripts/copy-functions.mjs",
     "preview": "npm run preview --workspace web"
+  },
+  "devDependencies": {
+    "marked": "^18.0.0"
   }
 }

@@ -44,7 +44,7 @@ export const SEED_POSTS = [
 
   // —— 补充中低样本，让分布更真实 ——
   { topic: 'AI行业观察', title: '大模型价格战打到今天，普通人能得到什么', platform: 'wechat', publishedAt: '2026-06-04T15:00:00+08:00', keywords: ['AI行业', '大模型'], read: 10400, like: 195, looking: 160, comment: 48, share: 190, followGain: 76 },
-  { topic: '职场成长', title: '在大厂做AI项目，我学到的3件事', platform: 'wechat', publishedAt: '2026-06-21T20:30:00+08:00', keywords: ['职场', 'AI', '成长'], read: 15600, like: 340, looking: 300, comment: 82, share: 360, followGain: 145 },
+  { topic: '职场成长', title: '在一家科技公司做AI项目，我学到的3件事', platform: 'wechat', publishedAt: '2026-06-21T20:30:00+08:00', keywords: ['职场', 'AI', '成长'], read: 15600, like: 340, looking: 300, comment: 82, share: 360, followGain: 145 },
   { topic: '内容创作', title: '爆款标题的6个套路，学会了随手10万+', platform: 'wechat', publishedAt: '2026-06-25T21:20:00+08:00', keywords: ['标题', '内容创作', '爆款'], read: 24500, like: 590, looking: 520, comment: 155, share: 790, followGain: 320 },
   { topic: '随笔感悟', title: '一些零碎的想法', platform: 'wechat', publishedAt: '2026-06-08T22:50:00+08:00', keywords: ['随笔'], read: 2600, like: 42, looking: 28, comment: 9, share: 14, followGain: 4 },
   { topic: '效率方法', title: '时间管理的本质，其实就一句话', platform: 'wechat', publishedAt: '2026-06-15T13:40:00+08:00', keywords: ['效率', '时间管理'], read: 9700, like: 175, looking: 148, comment: 40, share: 155, followGain: 62 },

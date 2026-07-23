@@ -3,10 +3,10 @@
 // 把 Markdown 中间文件（方案书 / 命中复盘等）转成套用官网 doc 模板的 HTML，
 // 视觉与全站统一（design.css + site.js 注入 nav/footer），自动生成侧边 TOC。
 //
-// 用法：node scripts/build-docs.mjs
-// 依赖：marked（安装在 node workspace，运行时通过 NODE_PATH 注入）
+// 用法：npm install && node scripts/build-docs.mjs
+// 依赖：marked（见 app/package.json devDependencies，npm install 后按包名解析）
 
-import { marked } from '/Users/yangguang/.workbuddy/binaries/node/workspace/node_modules/marked/lib/marked.esm.js';
+import { marked } from 'marked';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
