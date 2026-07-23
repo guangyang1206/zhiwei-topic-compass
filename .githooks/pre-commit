@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+#
+# pre-commit 敏感信息扫描钩子
+# ------------------------------------------------------------
+# 目的：在「提交」阶段（比 push 更早）扫描暂存区，拦截疑似密钥 /
+#       令牌 / 私钥等敏感信息，避免凭据进入仓库历史（含公开 GitHub）。
+#
+# 启用方式（仓库根目录执行一次，与 pre-push 同目录）：
+#   git config core.hooksPath .githooks
+#   chmod +x .githooks/*
+#
+# 绕过（仅限确认误报时）：
+#   git commit --no-verify
+#
+# 注意：本钩子只扫「暂存区新增/修改行」+ 密钥类规则，覆盖面窄于人工
+#       合规自查清单。发布前仍须逐项核对 docs/工程/分支模型与安全钩子.md
+#       第四节「发布前合规自查清单」（凭据 / 公司内部信息 / 个人路径 /
+#       PII / 依赖可复现）。钩子通过 ≠ 完全合规。
+# ------------------------------------------------------------
+
+set -euo pipefail
+
+RED=$'\033[31m'; YELLOW=$'\033[33m'; GREEN=$'\033[32m'; DIM=$'\033[2m'; RESET=$'\033[0m'
+
+# ------------------------------------------------------------
+# 敏感信息正则规则（名称 | 正则）—— 与 pre-push 保持一致
+# ------------------------------------------------------------
+patterns=(
+  "GitHub 细粒度 PAT|github_pat_[A-Za-z0-9_]{20,}"
+  "GitHub 经典 Token|gh[pousr]_[A-Za-z0-9]{30,}"
+  "OpenAI 密钥|sk-[A-Za-z0-9]{20,}"
+  "腾讯云 SecretId|AKID[A-Za-z0-9]{13,}"
+  "AWS Access Key|AKIA[0-9A-Z]{16}"
+  "Google API Key|AIza[0-9A-Za-z_\\-]{35}"
+  "Slack Token|xox[baprs]-[0-9A-Za-z\\-]{10,}"
+  "私钥文件头|-----BEGIN (RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----"
+  "通用密钥赋值|(secret|password|passwd|api[_-]?key|access[_-]?token|auth[_-]?token|private[_-]?key)[\"'\`]?[[:space:]]*[:=][[:space:]]*[\"'\`][A-Za-z0-9/+_\\-]{16,}[\"'\`]"
+)
+
+# 允许的占位/示例白名单（这些命中视为安全，不拦截）
+allow_regex='(YOUR_|<|xxx|XXX|example|EXAMPLE|placeholder|PLACEHOLDER|changeme|dummy|test[_-]?token|\*\*\*|\.\.\.)'
+
+echo "${DIM}[pre-commit] 扫描暂存区中的敏感信息…${RESET}"
+
+found=0
+report=""
+
+# 收集暂存区全部新增(+)行；新文件整文件以 + 呈现，修改文件仅变更行
+staged_diff=$(git diff --cached --unified=0 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+[ -z "$staged_diff" ] && { echo "${GREEN}[pre-commit] ✓ 暂存区无新增内容，允许提交。${RESET}"; exit 0; }
+
+for rule in "${patterns[@]}"; do
+  name="${rule%%|*}"
+  regex="${rule#*|}"
+  # 命中且不在白名单里（用 -e 终止选项解析，避免以 - 开头的正则被当成 grep 选项）
+  hits=$(printf '%s\n' "$staged_diff" | grep -nE -e "$regex" | grep -vE -e "$allow_regex" || true)
+  if [ -n "$hits" ]; then
+    found=1
+    report+="${RED}✗ [${name}]${RESET}\n"
+    # 打码展示命中片段（保留首尾，中间星号），最多 3 行
+    masked=$(printf '%s\n' "$hits" | head -3 | sed -E 's/([A-Za-z0-9_]{4})[A-Za-z0-9/+_\-]{6,}([A-Za-z0-9]{2})/\1****\2/g')
+    report+="${DIM}${masked}${RESET}\n"
+  fi
+done
+
+if [ "$found" -eq 1 ]; then
+  echo ""
+  echo "${RED}════════════════════════════════════════════════════════${RESET}"
+  echo "${RED}  🚫 提交被拦截：检测到疑似敏感信息${RESET}"
+  echo "${RED}════════════════════════════════════════════════════════${RESET}"
+  printf "%b" "$report"
+  echo ""
+  echo "${YELLOW}请处理后再提交：${RESET}"
+  echo "  1. 从代码中移除密钥，改用环境变量 / 密钥管理"
+  echo "  2. 若已 push 到远端，立即到对应平台吊销并轮换凭证"
+  echo "  3. 发布前请逐项核对「发布前合规自查清单」"
+  echo "     ${DIM}见 docs/工程/分支模型与安全钩子.md 第四节${RESET}"
+  echo ""
+  echo "${DIM}确认为误报时可临时绕过： git commit --no-verify${RESET}"
+  echo ""
+  exit 1
+fi
+
+echo "${GREEN}[pre-commit] ✓ 未发现敏感信息，允许提交。${RESET}"
+exit 0
